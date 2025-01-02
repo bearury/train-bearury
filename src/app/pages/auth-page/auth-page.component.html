@@ -1,0 +1,73 @@
+<div
+  class="wrapper"
+  tuiAppearance="floating"
+  tuiCardLarge
+>
+  <div class="navigation">
+    <a routerLink="/signin" routerLinkActive="active">Вход</a>
+    <a routerLink="/signup" routerLinkActive="active">Регистрация</a>
+  </div>
+  <div class="form-wrapper">
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form">
+      @if (form.controls) {
+        <div>
+          <tui-textfield>
+            <label for="email" tuiLabel>Введите почту</label>
+            <input [formControl]="form.controls.email"
+                   id="email"
+                   tuiTextfield
+                   type="text"
+            />
+          </tui-textfield>
+          <tui-error
+            [error]="[] | tuiFieldError | async"
+            [formControl]="form.controls.email"
+            class="error-message"
+          />
+        </div>
+        <div>
+          <tui-textfield>
+            <label for="password" tuiLabel>Введите пароль</label>
+            <input [formControl]="form.controls.password"
+                   [type]="isPasswordFieldTextType() ? 'password' : 'text'"
+                   id="password"
+                   tuiTextfield
+            />
+            <button (click)="togglePasswordFieldTextType()" class="button-eye" type="button">
+              <tui-icon
+                [style.color]="'gray'"
+                icon="@tui.eye"
+              />
+            </button>
+          </tui-textfield>
+          <tui-error
+            [error]="[] | tuiFieldError | async"
+            [formControl]="form.controls.password"
+            class="error-message"
+          />
+        </div>
+        <div *ngIf="form.controls.name">
+          <tui-textfield>
+            <label for="name" tuiLabel>Введите имя</label>
+            <input [formControl]="form.controls.name"
+                   id="name"
+                   tuiTextfield
+                   type="text"
+            />
+          </tui-textfield>
+          <tui-error
+            [error]="[] | tuiFieldError | async"
+            [formControl]="form.controls.name"
+            class="error-message"
+          />
+        </div>
+      }
+      <button appearance="accent" tuiButton type="submit">{{ isLoginRoute() ? 'Вход' : 'Регистрация' }}</button>
+    </form>
+  </div>
+</div>
+
+<ng-template #tooltip>
+  <div>Очистить ошибки</div>
+</ng-template>
+

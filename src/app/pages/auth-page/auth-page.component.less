@@ -1,0 +1,121 @@
+:host {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.wrapper {
+  margin: 2rem auto;
+}
+
+.navigation {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+
+  a {
+    width: 50%;
+    border: none;
+    height: 3rem;
+    background-color: initial;
+    cursor: pointer;
+    border-bottom-width: 0;
+    border-image: initial;
+    font-weight: bold;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: var(--app-txt-primary);
+    position: relative;
+  }
+
+  a:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--app-linear-gradient-first), var(--app-linear-gradient-second));
+  }
+
+  a.active:before {
+    transition: all 0.2s ease 0s;
+    width: 100%;
+  }
+}
+
+
+.form {
+  width: 22rem;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-wrapper {
+  display: flex;
+  position: relative;
+}
+
+.group {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  width: 200px;
+  height: fit-content;
+  z-index: -1;
+}
+
+
+@media (max-width: 1100px) {
+  .form-wrapper {
+    flex-direction: column;
+    flex: revert;
+  }
+
+  .group {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  :host {
+    align-items: start;
+    margin-top: 2rem;
+    padding: 0 1rem;
+    width: auto;
+  }
+
+
+  .wrapper {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .navigation {
+    width: 100%;
+  }
+
+  .form {
+    width: 100%;
+  }
+}
+
+
+.error-message {
+  padding-left: 1.25rem;
+  color: var(--app-txt-error);
+}
+
+.button-eye {
+  background-color: initial;
+  border: none;
+  cursor: pointer;
+}
