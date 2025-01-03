@@ -1,16 +1,23 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TuiNavigation } from '@taiga-ui/layout';
-import { NgOptimizedImage } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TUI_DARK_MODE, TuiButton, TuiIcon } from '@taiga-ui/core';
 
 @Component({
   selector: 'app-header',
   imports: [
     TuiNavigation,
-    NgOptimizedImage,
+    RouterLink,
+    RouterLinkActive,
+    TuiIcon,
+    TuiButton,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
+  protected readonly darkMode = inject(TUI_DARK_MODE);
+
+
 }

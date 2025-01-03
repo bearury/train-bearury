@@ -1,8 +1,20 @@
-<header tuiNavigationHeader>
-  <div class="container">
+<header class="header">
+  <div class="container wrapper">
     <div class="logo">
       <img alt="logo" src="tumblr.png" />
     </div>
+
+
+    <nav class="navigation" tuiNavigationNav>
+      <a routerLink="/admin/stations" routerLinkActive>Станции</a>
+    </nav>
+
+    <button (click)="darkMode.set(!darkMode())" appearance="secondary" class="button-theme" size="s" tuiIconButton>
+      <tui-icon [icon]="darkMode() ? '@tui.sun' : '@tui.moon'" />
+    </button>
+
+
   </div>
+
 
 </header>

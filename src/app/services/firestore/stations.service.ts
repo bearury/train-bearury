@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { collection, collectionData, Firestore, query } from '@angular/fire/firestore';
+import { collection, collectionData, Firestore, limit, orderBy, query } from '@angular/fire/firestore';
 import { TuiAlertService } from '@taiga-ui/core';
 import { Observable } from 'rxjs';
 
@@ -12,10 +12,12 @@ export class StationsFirestoreService {
 
 
   public getAll(): Observable<never> {
-    const queryId = query(collection(this.db, 'stations'));
-
-    console.log('🐲: ', queryId);
-
+    const queryId = query(
+      collection(this.db, 'stations'),
+      orderBy('city', 'asc'),
+      limit(2),
+    );
     return collectionData(queryId, { idField: 'id' }) as Observable<never>;
   }
 }
+

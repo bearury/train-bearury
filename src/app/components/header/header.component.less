@@ -1,15 +1,34 @@
-.logo {
+.header {
+  background: var(--tui-background-base-alt);
+}
 
+.navigation {
+  border-image: none;
+}
+
+.logo {
   width: 35px;
   height: 35px;
 
+  margin-right: auto;
 
   img {
     width: 100%;
     height: 100%;
-    bottom: 0 !important;
-    top: auto !important;
   }
+}
 
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
+  a {
+    font-size: 1rem;
+  }
+}
+
+.button-theme {
+  margin-left: 1.25rem;
+  border-radius: 100%;
 }

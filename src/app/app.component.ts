@@ -1,5 +1,5 @@
-import { TuiRoot } from '@taiga-ui/core';
-import { Component } from '@angular/core';
+import { TUI_DARK_MODE, TuiRoot } from '@taiga-ui/core';
+import { Component, inject } from '@angular/core';
 import { LayoutComponent } from './components/layout/layout.component';
 
 @Component({
@@ -9,4 +9,5 @@ import { LayoutComponent } from './components/layout/layout.component';
   styleUrl: './app.component.less',
 })
 export class AppComponent {
+  protected readonly darkMode = inject(TUI_DARK_MODE);
 }
