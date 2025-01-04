@@ -1,0 +1,22 @@
+<div class="wrapper" tuiSurface>
+  <div class="title-block">
+    <h2 class="title" tuiTitle>{{ station().city }}</h2>
+    <button appearance="action" size="s" tuiButton>
+      <tui-icon icon="@tui.square-pen" />
+    </button>
+  </div>
+
+  <div class="content">
+    <div class="primary-block">
+      <div> Широта: {{ station().latitude }}</div>
+      <div> Долгота: {{ station().longitude }}</div>
+    </div>
+
+    <div class="secondary-block">
+      Примыкание станций:
+      @for (connect of station().connectedTo; track connect.name) {
+        <p>{{ connect.name }} - {{ connect.distance }} км</p>
+      }
+    </div>
+  </div>
+</div>

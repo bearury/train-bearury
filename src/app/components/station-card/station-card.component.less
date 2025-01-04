@@ -1,0 +1,44 @@
+.wrapper {
+  box-shadow: var(--tui-shadow-small);
+  inline-size: 22.5rem;
+  max-inline-size: 100%;
+  border-radius: var(--tui-radius-l);
+  margin-bottom: 1rem;
+  background: var(--tui-background-elevation-3);
+  padding: 1rem;
+
+  .content {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.625rem;
+  }
+
+  .title-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+
+    &:after {
+      position: absolute;
+      content: '';
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--tui-background-accent-1);
+    }
+
+    .title {
+      margin-bottom: 0.25rem;
+    }
+  }
+}
+
+.primary-block {
+  flex: 0 0 40%;
+  overflow: hidden;
+}
+
+.secondary-block {
+  margin-left: auto;
+}

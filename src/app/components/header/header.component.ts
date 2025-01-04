@@ -15,9 +15,8 @@ import { TUI_DARK_MODE, TuiButton, TuiIcon } from '@taiga-ui/core';
   templateUrl: './header.component.html',
   styleUrl: './header.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class HeaderComponent {
   protected readonly darkMode = inject(TUI_DARK_MODE);
-
-
 }

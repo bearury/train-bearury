@@ -8,5 +8,7 @@ import { HeaderComponent } from '../header/header.component';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+}

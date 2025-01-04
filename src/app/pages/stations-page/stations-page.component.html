@@ -1,1 +1,25 @@
-<button (click)="get()" tuiButton>GET STATIONS</button>
+@let loading = loading$ | async;
+@let stations = stations$ | async;
+
+<div class="container">
+
+  <button appearance="flat" class="button-create" size="s" tuiButton>
+    <tui-icon icon="@tui.plus" />
+    Создать станцию
+  </button>
+
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    <div class="content">
+      @for (station of stations; track station.id) {
+        <app-station-card [station]="station" />
+      }
+
+    </div>
+  }
+
+
+</div>

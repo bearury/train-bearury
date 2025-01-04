@@ -4,15 +4,15 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { of, Subject, takeUntil } from 'rxjs';
-import { AuthFirestoreService } from '../../services/firestore/auth.service';
-import { TuiAppearance, TuiButton, TuiError, TuiIcon, TuiTextfield } from '@taiga-ui/core';
+import { TuiAppearance, TuiButton, TuiError, TuiIcon, TuiLink, TuiTextfield } from '@taiga-ui/core';
 import { TuiFieldErrorPipe, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { TuiCardLarge } from '@taiga-ui/layout';
+import { AuthFirestoreService } from '@services/firestore/auth.service';
 
 @Component({
   selector: 'app-auth-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TuiTextfield, TuiError, TuiFieldErrorPipe, TuiIcon, TuiButton, RouterLink, RouterLinkActive, TuiAppearance, TuiCardLarge],
+  imports: [CommonModule, ReactiveFormsModule, TuiTextfield, TuiError, TuiFieldErrorPipe, TuiIcon, TuiButton, RouterLink, RouterLinkActive, TuiAppearance, TuiCardLarge, TuiLink],
   templateUrl: './auth-page.component.html',
   styleUrl: './auth-page.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
