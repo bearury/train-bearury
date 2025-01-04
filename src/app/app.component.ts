@@ -1,6 +1,6 @@
 import { TUI_DARK_MODE, TuiRoot } from '@taiga-ui/core';
 import { Component, inject } from '@angular/core';
-import { LayoutComponent } from './components/layout/layout.component';
+import { LayoutComponent } from '@components/layout/layout.component';
 
 @Component({
   selector: 'app-root',

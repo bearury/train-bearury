@@ -1,7 +1,7 @@
 <div class="wrapper" tuiSurface>
   <div class="title-block">
     <h2 class="title" tuiTitle>{{ station().city }}</h2>
-    <button appearance="action" size="s" tuiButton>
+    <button (click)="handleClick(station().id)" appearance="action" size="s" tuiButton>
       <tui-icon icon="@tui.square-pen" />
     </button>
   </div>

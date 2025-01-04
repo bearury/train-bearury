@@ -1,0 +1,41 @@
+{{ stationId() ?? 'Пока нет ID' }}
+<div class="container">
+  <div class="map-container">
+    <ya-map (ready)="onReady($event)" (yaclick)="onClick($event)" [center]="[55.755702, 55.755702]" [zoom]="6">
+      <ya-placemark [geometry]="[latitudeMap(), longitudeMap()]"></ya-placemark>
+    </ya-map>
+  </div>
+
+  <form [formGroup]="form" class="form" tuiForm="m">
+
+    <tui-textfield>
+      <label for="city" tuiLabel>Название города</label>
+      <input [formControl]="form.controls.city"
+             id="city"
+             tuiTextfield
+             type="text"
+      />
+    </tui-textfield>
+
+
+    <tui-textfield>
+      <label for="latitude" tuiLabel>Название города</label>
+      <input [formControl]="form.controls.latitude"
+             id="latitude"
+             tuiTextfield
+             type="text"
+      />
+    </tui-textfield>
+
+    <tui-textfield>
+      <label for="longitude" tuiLabel>Долгота</label>
+      <input [formControl]="form.controls.longitude"
+             id="longitude"
+             tuiTextfield
+             type="text"
+      />
+    </tui-textfield>
+
+
+  </form>
+</div>

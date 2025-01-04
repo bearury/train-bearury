@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, EventEmitter, input, Output } from '@angular/core';
 import { TuiButton, TuiIcon, TuiSurface, TuiTitle } from '@taiga-ui/core';
 import { Station } from '../../shared/interfaces/station.interface';
 
@@ -16,4 +16,10 @@ import { Station } from '../../shared/interfaces/station.interface';
 })
 export class StationCardComponent {
   public station = input.required<Station>();
+
+  @Output() private stationChange = new EventEmitter<string>();
+
+  public handleClick(stationId: string): void {
+    this.stationChange.emit(stationId);
+  }
 }
