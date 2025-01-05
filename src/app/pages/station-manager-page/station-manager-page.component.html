@@ -1,8 +1,24 @@
 {{ stationId() ?? 'Пока нет ID' }}
 <div class="container">
-  <div class="map-container">
-    <ya-map (ready)="onReady($event)" (yaclick)="onClick($event)" [center]="[55.755702, 55.755702]" [zoom]="6">
-      <ya-placemark [geometry]="[latitudeMap(), longitudeMap()]"></ya-placemark>
+  <div #map class="map-container">
+    <ya-map (ready)="onReady($event)" (yaclick)="onClick($event)" [center]="[55.755702, 37.617531]" [zoom]="6">
+      @for (balloon of balloons(); track balloon.id) {
+        <ya-placemark
+          (yaclick)="onBalloon($event)"
+          [geometry]="[latitudeMap(), longitudeMap()]"
+          [options]="{iconColor: 'green'}"
+          [properties]="{
+            hintContent: 'Hint content',
+            balloonContent: balloon.city,
+          }"></ya-placemark>
+      }
+
+      @if (balloons().length > 1) {
+        <ya-geoobject
+          [feature]="{geometry: {type: 'LineString',coordinates: []}}"
+          [options]="{strokeColor: '#0000FF'}"
+        ></ya-geoobject>
+      }
     </ya-map>
   </div>
 
@@ -19,7 +35,7 @@
 
 
     <tui-textfield>
-      <label for="latitude" tuiLabel>Название города</label>
+      <label for="latitude" tuiLabel>Широта</label>
       <input [formControl]="form.controls.latitude"
              id="latitude"
              tuiTextfield
@@ -36,6 +52,15 @@
       />
     </tui-textfield>
 
+    <button appearance="accent" tuiButton type="submit">Сохранить</button>
 
   </form>
+
+  @for (balloonName of balloons(); track balloonName.id; let index = $index) {
+    <button tuiButton size="s" appearance="floating">{{ index + 1 }}</button>
+  }
 </div>
+
+<ng-template>
+
+</ng-template>
