@@ -4,25 +4,17 @@
     <ya-map (ready)="onReady($event)" (yaclick)="onClick($event)" [center]="[55.755702, 37.617531]" [zoom]="6">
       @for (balloon of balloons(); track balloon.id) {
         <ya-placemark
-          (yaclick)="onBalloon($event)"
-          [geometry]="[latitudeMap(), longitudeMap()]"
-          [options]="{iconColor: 'green'}"
+          [geometry]="[balloon.latitude, balloon.longitude]"
+          [options]="{iconColor: balloon.id === '1' ? 'green' : 'red'}"
           [properties]="{
             hintContent: 'Hint content',
             balloonContent: balloon.city,
           }"></ya-placemark>
       }
-
-      @if (balloons().length > 1) {
-        <ya-geoobject
-          [feature]="{geometry: {type: 'LineString',coordinates: []}}"
-          [options]="{strokeColor: '#0000FF'}"
-        ></ya-geoobject>
-      }
     </ya-map>
   </div>
 
-  <form [formGroup]="form" class="form" tuiForm="m">
+  <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form" tuiForm="m">
 
     <tui-textfield>
       <label for="city" tuiLabel>Название города</label>
@@ -52,15 +44,43 @@
       />
     </tui-textfield>
 
+
+    <div class="connectedTo-group" formArrayName="connectedTo">
+      <div class="connectedTo-header">
+        <h2 class="title" tuiTitle="s">Прилегающие станции</h2>
+        <button (click)="handleAddConnectedTo()" appearance="secondary" class="button-theme" size="s" tuiIconButton>
+          <tui-icon icon="@tui.plus" />
+        </button>
+      </div>
+
+      @for (city of form.controls.connectedTo.controls; track city; let index = $index) {
+        <div class="connectedTo-item">
+          <tui-select [formControl]="city" tuiTextfieldSize="m" [stringify]="getNameFromStation" class="connectedTo-select">
+            Станция {{ index + 1 }}
+            <tui-data-list-wrapper
+              tuiScrollable
+              *tuiDataList
+              [itemContent]="cardContent"
+              [items]="stations()"
+            />
+          </tui-select>
+          <button (click)="handleRemoveConnectedTo(index)" appearance="floating" size="s" tuiButton>
+            <tui-icon icon="@tui.circle-x" />
+          </button>
+        </div>
+      }
+    </div>
+
     <button appearance="accent" tuiButton type="submit">Сохранить</button>
-
   </form>
-
-  @for (balloonName of balloons(); track balloonName.id; let index = $index) {
-    <button tuiButton size="s" appearance="floating">{{ index + 1 }}</button>
-  }
 </div>
 
-<ng-template>
 
+<ng-template
+  #cardContent
+  let-item
+>
+  <div class="card-item">
+    {{ item.city }}
+  </div>
 </ng-template>
