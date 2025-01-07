@@ -1,78 +1,97 @@
-{{ stationId() ?? 'Пока нет ID' }}
+@let loading = loading$ | async;
+
 <div class="container">
-  <div #map class="map-container">
-    <ya-map (ready)="onReady($event)" (yaclick)="onClick($event)" [center]="[55.755702, 37.617531]" [zoom]="6">
-      @for (balloon of balloons(); track balloon.id) {
-        <ya-placemark
-          [geometry]="[balloon.latitude, balloon.longitude]"
-          [options]="{iconColor: balloon.id === '1' ? 'green' : 'red'}"
-          [properties]="{
+  <h1 class="title" tuiTitle="m">
+    <tui-icon icon="@tui.map-pinned" />
+    Менеджер станции
+  </h1>
+
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    <div class="content">
+      <div #map class="map-container">
+        <ya-map (ready)="onReady($event)" (yaclick)="onClick($event)" [center]="[currentStation()?.latitude ?? 55.755702, currentStation()?.longitude ?? 37.617531]" [zoom]="6">
+          @for (balloon of balloons(); track balloon.id) {
+            <ya-placemark
+              [geometry]="[balloon.latitude, balloon.longitude]"
+              [options]="{iconColor: balloon.id === '1' ? 'green' : 'red'}"
+              [properties]="{
             hintContent: 'Hint content',
             balloonContent: balloon.city,
           }"></ya-placemark>
-      }
-    </ya-map>
-  </div>
-
-  <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form" tuiForm="m">
-
-    <tui-textfield>
-      <label for="city" tuiLabel>Название города</label>
-      <input [formControl]="form.controls.city"
-             id="city"
-             tuiTextfield
-             type="text"
-      />
-    </tui-textfield>
-
-
-    <tui-textfield>
-      <label for="latitude" tuiLabel>Широта</label>
-      <input [formControl]="form.controls.latitude"
-             id="latitude"
-             tuiTextfield
-             type="text"
-      />
-    </tui-textfield>
-
-    <tui-textfield>
-      <label for="longitude" tuiLabel>Долгота</label>
-      <input [formControl]="form.controls.longitude"
-             id="longitude"
-             tuiTextfield
-             type="text"
-      />
-    </tui-textfield>
-
-
-    <div class="connectedTo-group" formArrayName="connectedTo">
-      <div class="connectedTo-header">
-        <h2 class="title" tuiTitle="s">Прилегающие станции</h2>
-        <button (click)="handleAddConnectedTo()" appearance="secondary" class="button-theme" size="s" tuiIconButton>
-          <tui-icon icon="@tui.plus" />
-        </button>
+          }
+        </ya-map>
       </div>
 
-      @for (city of form.controls.connectedTo.controls; track city; let index = $index) {
-        <div class="connectedTo-item">
-          <tui-select [formControl]="city" tuiTextfieldSize="m" [stringify]="getNameFromStation" class="connectedTo-select">
-            Станция {{ index + 1 }}
-            <tui-data-list-wrapper
-              tuiScrollable
-              *tuiDataList
-              [itemContent]="cardContent"
-              [items]="stations()"
-            />
-          </tui-select>
-          <button (click)="handleRemoveConnectedTo(index)" appearance="floating" size="s" tuiButton>
-            <tui-icon icon="@tui.circle-x" />
-          </button>
-        </div>
-      }
-    </div>
+      <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form" tuiForm="m">
 
-    <button appearance="accent" tuiButton type="submit">Сохранить</button>
-  </form>
+        <tui-textfield>
+          <label for="city" tuiLabel>Название города</label>
+          <input [formControl]="form.controls.city"
+                 id="city"
+                 tuiTextfield
+                 type="text"
+          />
+        </tui-textfield>
+
+
+        <tui-textfield>
+          <label for="latitude" tuiLabel>Широта</label>
+          <input [formControl]="form.controls.latitude"
+                 id="latitude"
+                 tuiTextfield
+                 type="text"
+          />
+        </tui-textfield>
+
+        <tui-textfield>
+          <label for="longitude" tuiLabel>Долгота</label>
+          <input [formControl]="form.controls.longitude"
+                 id="longitude"
+                 tuiTextfield
+                 type="text"
+          />
+        </tui-textfield>
+
+
+        <div class="connectedTo-group" formArrayName="connectedTo">
+          <div class="connectedTo-header">
+            <h2 class="title" tuiTitle="s">Прилегающие станции</h2>
+            <button (click)="handleAddConnectedTo()" appearance="secondary" class="button-theme" size="s" tuiIconButton>
+              <tui-icon icon="@tui.plus" />
+            </button>
+          </div>
+
+          @for (city of form.controls.connectedTo.controls; track city.value; let index = $index) {
+            <div class="connectedTo-item">
+              <tui-select [formControl]="city" tuiTextfieldSize="m" [stringify]="getNameFromStation" class="connectedTo-select" required>
+                Станция {{ index + 1 }}
+                <tui-data-list-wrapper
+                  tuiScrollable
+                  *tuiDataList
+                  [itemContent]="cardContent"
+                  [items]="stations()"
+                />
+              </tui-select>
+              <button (click)="handleRemoveConnectedTo(index)" appearance="floating" size="s" tuiButton type="button">
+                <tui-icon icon="@tui.circle-x" />
+              </button>
+              <tui-error
+                [error]="[] | tuiFieldError | async"
+                [formControl]="city"
+                class="error-message"
+              />
+            </div>
+          }
+        </div>
+
+        <button appearance="accent" tuiButton type="submit">Сохранить</button>
+      </form>
+    </div>
+  }
 </div>
 
 

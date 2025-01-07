@@ -1,6 +1,8 @@
 import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { StationForm } from '@interfaces/station-form.interface';
 
+
+//TODO нужна ли вообще!!!
 export function uniqueValuesValidator(): ValidatorFn {
   return (control: AbstractControl<StationForm>): ValidationErrors | null => {
     const form = control as unknown as FormGroup<StationForm>;
