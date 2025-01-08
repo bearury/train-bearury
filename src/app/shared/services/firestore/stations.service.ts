@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { collection, collectionData, deleteDoc, doc, docData, Firestore, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { TuiAlertService } from '@taiga-ui/core';
 import { forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { LoaderService } from '../loader.service';
@@ -36,8 +36,22 @@ export class StationsFirestoreService {
     ) as Observable<Station[]>;
   }
 
-  public addStation(station: Omit<StationEntity, 'id'>): void {
-    console.log('🐲: ', station);
+  public addStation(station: Omit<StationEntity, 'id'>): Observable<void[]> {
+    return from(addDoc(collection(this.db, 'stations'), station)).pipe(
+      switchMap((stationDocRef) => {
+        const updateId = from(updateDoc(stationDocRef, { id: stationDocRef.id }));
+        const updateConnectedTo = this.updateConnectedAfterUpdatingCurrentStation(
+          { id: stationDocRef.id, ...station },
+          station.connectedTo,
+        );
+
+        return forkJoin([updateId, updateConnectedTo]).pipe(
+          map(([idUpdateResult, connectionsUpdateResult]) => {
+            return [idUpdateResult, ...(connectionsUpdateResult || [])] as void[];
+          }),
+        );
+      }),
+    );
   }
 
   public updateStationConnectedTo(stationId: string, connectedTo: { id: string, distance: number }[]): Observable<void[] | null> {
@@ -86,6 +100,10 @@ export class StationsFirestoreService {
           const currentConnectedTo = station.connectedTo;
           const hasCurrentStation = currentConnectedTo.some(connect => connect.id === currentStation.id);
           const isConnectedToCurrentStation = connectedTo.some(connect => connect.id === station.id);
+
+
+          console.log('🍁: ', currentConnectedTo, hasCurrentStation, isConnectedToCurrentStation);
+
 
           if (station.id === currentStation.id) return null; // Если это текущая станция то, ничего не делаем и возвращаем null
 

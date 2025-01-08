@@ -1,7 +1,7 @@
 export interface StationEntity {
-  id: string;
-  city: string;
-  latitude: number;
-  longitude: number;
-  connectedTo: { id: string; distance: number }[];
+  readonly id: string;
+  readonly city: string;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly connectedTo: { id: string; distance: number }[];
 }

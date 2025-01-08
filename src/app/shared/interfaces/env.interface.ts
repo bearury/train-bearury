@@ -1,9 +1,9 @@
 export interface IEnv {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-  measurementId: string;
+  readonly apiKey: string;
+  readonly authDomain: string;
+  readonly projectId: string;
+  readonly storageBucket: string;
+  readonly messagingSenderId: string;
+  readonly appId: string;
+  readonly measurementId: string;
 }

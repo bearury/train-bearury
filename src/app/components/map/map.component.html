@@ -1,1 +1,10 @@
-<p>map works!</p>
+<ya-map (ready)="onReadyMap($event)" (yaclick)="onClickMap($event)" [center]="[initValueCoordinates().latitude, initValueCoordinates().longitude]" [zoom]="6">
+  @for (balloon of balloons$ | async; track $index) {
+    <ya-placemark
+      [geometry]="[balloon.latitude, balloon.longitude]"
+      [options]="{iconColor: balloon.id === mapService.TEMP_STATION_ID ? 'green' : 'red'}"
+      [properties]="{
+            hintContent: balloon.city
+          }"></ya-placemark>
+  }
+</ya-map>
