@@ -14,10 +14,7 @@ import { EmittedValueMap } from '@interfaces/emitted-value-map.interface';
   styleUrl: './map.component.less',
 })
 export class MapComponent implements OnInit, AfterViewInit {
-  public initValueCoordinates = input<{ latitude: number, longitude: number }>({
-    latitude: 55.755702,
-    longitude: 37.617531,
-  });
+  public initValueCoordinates = input.required<{ latitude: number, longitude: number }>();
   public isEditMode = signal<boolean>(false);
   public mapService = inject(MapService);
   public balloons$ = this.mapService.balloons$;

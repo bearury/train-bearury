@@ -86,7 +86,7 @@
         <button appearance="accent" tuiButton type="submit">Сохранить</button>
       </form>
 
-      <app-map (clickMap)="onClickMap($event)" />
+      <app-map (clickMap)="onClickMap($event)" [initValueCoordinates]="{latitude: activeCurrentStation()?.latitude ?? 55.755702, longitude: activeCurrentStation()?.longitude ??  37.617531}" />
     </div>
   }
 </div>

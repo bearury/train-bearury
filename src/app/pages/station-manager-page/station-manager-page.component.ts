@@ -70,6 +70,7 @@ export class StationManagerPageComponent implements OnInit {
   );
 
   public stations = signal<Station[]>([]);
+  public activeCurrentStation = signal<Station | null>(null);
   private mapService = inject(MapService);
 
   private readonly alert = inject(TuiAlertService);
@@ -188,6 +189,7 @@ export class StationManagerPageComponent implements OnInit {
     this.stations.set(stations);
 
     const currentStation: Station | null = stations.find(station => station.id === stationId) ?? null;
+    this.activeCurrentStation.set(currentStation);
     this.form.controls.connectedTo.clear();
 
     if (currentStation !== null) {
