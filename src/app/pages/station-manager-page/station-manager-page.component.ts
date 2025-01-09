@@ -25,25 +25,23 @@ import { LoaderInPageService } from '@services/loader-in-page.service';
   imports: [
     FormsModule,
     ReactiveFormsModule,
+    AngularYandexMapsModule,
+    AsyncPipe,
+    MapComponent,
     TuiLabel,
     TuiTextfieldComponent,
     TuiTextfieldDirective,
     TuiForm,
     TuiInputNumberModule,
-    AngularYandexMapsModule,
     TuiButton,
     TuiSelectModule,
     TuiTextfieldControllerModule,
     TuiScrollable,
     TuiIcon,
     TuiTitle,
-    AsyncPipe,
     TuiLoader,
     TuiError,
     TuiFieldErrorPipe,
-    MapComponent,
-
-
   ],
   templateUrl: './station-manager-page.component.html',
   styleUrl: './station-manager-page.component.less',
@@ -96,14 +94,12 @@ export class StationManagerPageComponent implements OnInit {
       this.mapService.setEditMode();
     }
 
-
     this.stationsFirestoreService.getAll().subscribe(stations => this.setInitData(stations, this.stationId()));
 
     this.form.controls.connectedTo.valueChanges.subscribe((value) => {
       const filteredArrayIsNullValueControls = value.filter(item => item !== null);
       this.mapService.addBalloons(filteredArrayIsNullValueControls);
     });
-
   }
 
 
@@ -111,9 +107,7 @@ export class StationManagerPageComponent implements OnInit {
     this.setStateCurrentValue(event.city, event.latitude, event.longitude);
   }
 
-
   public onSubmit(): void {
-
     if (this.form.valid) {
       const city = this.form.controls.city.value as string;
       const latitude = Number(this.form.controls.latitude.value);
@@ -164,7 +158,6 @@ export class StationManagerPageComponent implements OnInit {
     return station.city;
   }
 
-
   public handleAddConnectedTo(): void {
     const control = new FormControl(null, {
       validators: Validators.compose([Validators.required, uniqueValuesValidator()]),
@@ -183,7 +176,6 @@ export class StationManagerPageComponent implements OnInit {
     };
 
     this.mapService.setMainBalloon(tempStation);
-    // this.form.controls.connectedTo.clear();
 
     this.form.controls.city.setValue(city);
     this.form.controls.latitude.setValue(latitude.toFixed(6));
@@ -197,13 +189,14 @@ export class StationManagerPageComponent implements OnInit {
 
     if (stations.length && currentStation === null && this.stationId() !== null) {
       this.alert.open('Станция с таким ID не найдена!', { appearance: 'error' }).subscribe();
+      this.stationId.set(null);
       this.router.navigate(['/admin/stations']);
     }
 
     this.activeCurrentStation.set(currentStation);
     this.form.controls.connectedTo.clear();
 
-    if (currentStation !== null) {
+    if (currentStation) {
       this.setStateCurrentValue(currentStation.city, +currentStation.latitude, +currentStation.longitude);
 
       this.form.controls.city.disable();

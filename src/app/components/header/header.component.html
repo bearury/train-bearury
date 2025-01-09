@@ -5,7 +5,9 @@
     </div>
     <nav class="navigation" tuiNavigationNav>
       <a routerLink="/admin/stations" routerLinkActive>Станции</a>
+      <a routerLink="/signin" routerLinkActive>Вход</a>
     </nav>
+
 
     <button (click)="darkMode.set(!darkMode())" appearance="secondary" class="button-theme" size="s" tuiIconButton>
       <tui-icon [icon]="darkMode() ? '@tui.sun' : '@tui.moon'" />

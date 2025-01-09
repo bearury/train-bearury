@@ -1,13 +1,14 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
-import { of, Subject, takeUntil } from 'rxjs';
+import { of } from 'rxjs';
 import { TuiAppearance, TuiButton, TuiError, TuiIcon, TuiTextfield } from '@taiga-ui/core';
 import { TuiFieldErrorPipe, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { TuiCardLarge } from '@taiga-ui/layout';
 import { AuthFirestoreService } from '@services/firestore/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-auth-page',
@@ -29,7 +30,7 @@ import { AuthFirestoreService } from '@services/firestore/auth.service';
     }),
   ],
 })
-export class AuthPageComponent implements OnInit, OnDestroy {
+export class AuthPageComponent implements OnInit {
   public readonly image = 'owl.png';
   public readonly loading = signal<boolean>(false);
   public readonly isPasswordFieldTextType = signal<boolean>(true);
@@ -52,7 +53,7 @@ export class AuthPageComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly authService = inject(AuthFirestoreService);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
 
   public isLoginRoute(): boolean {
     return this.location.path().includes('/signin');
@@ -82,7 +83,7 @@ export class AuthPageComponent implements OnInit, OnDestroy {
           this.form.value.email as string,
           this.form.value.password as string,
         )
-        .pipe(takeUntil(this.destroy$))
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((data) => {
           this.loading.set(false);
           if (data) {
@@ -96,7 +97,7 @@ export class AuthPageComponent implements OnInit, OnDestroy {
           this.form.value.password as string,
           this.form.value.name as string,
         )
-        .pipe(takeUntil(this.destroy$))
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
           this.loading.set(false);
           this.router.navigate(['/login']);
@@ -106,10 +107,5 @@ export class AuthPageComponent implements OnInit, OnDestroy {
 
   public togglePasswordFieldTextType(): void {
     this.isPasswordFieldTextType.update((value) => !value);
-  }
-
-  public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
