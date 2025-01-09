@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiAlertService, TuiButton, TuiError, TuiIcon, TuiLabel, TuiLoader, TuiScrollable, TuiTextfieldComponent, TuiTextfieldDirective, TuiTitle } from '@taiga-ui/core';
 import { TuiForm } from '@taiga-ui/layout';
@@ -10,13 +10,14 @@ import { StationsFirestoreService } from '@services/firestore/stations.service';
 import { StationForm } from '@interfaces/station-form.interface';
 import { getDistanceFromLatLonInKm } from '../../shared/helpers/haversine-value';
 import { LoaderService } from '@services/loader.service';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { TuiFieldErrorPipe, tuiValidationErrorsProvider } from '@taiga-ui/kit';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MapComponent } from '@components/map/map.component';
 import { EmittedValueMap } from '@interfaces/emitted-value-map.interface';
 import { MapService } from '@services/map.service';
 import { uniqueValuesValidator } from '../../shared/helpers/unique-values.validator';
+import { LoaderInPageService } from '@services/loader-in-page.service';
 
 
 @Component({
@@ -41,7 +42,7 @@ import { uniqueValuesValidator } from '../../shared/helpers/unique-values.valida
     TuiError,
     TuiFieldErrorPipe,
     MapComponent,
-    NgIf,
+
 
   ],
   templateUrl: './station-manager-page.component.html',
@@ -77,9 +78,12 @@ export class StationManagerPageComponent implements OnInit {
   private stationsFirestoreService = inject(StationsFirestoreService);
 
   private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
 
   private loaderService = inject(LoaderService);
   public loading$ = this.loaderService.loading$;
+  private loaderInPageService = inject(LoaderInPageService);
+  public loadingInPage$ = this.loaderInPageService.loading$;
   private readonly destroyRef = inject(DestroyRef);
 
   public ngOnInit(): void {
@@ -124,8 +128,7 @@ export class StationManagerPageComponent implements OnInit {
       } else if (this.stationId()) {
         this.stationsFirestoreService.updateStationConnectedTo(this.stationId() as string, connectedTo)
           .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(t => console.log('🚨: ЬФТПУК', t),
-          );
+          .subscribe();
       } else {
         this.stationsFirestoreService.addStation({
           city,
@@ -133,7 +136,9 @@ export class StationManagerPageComponent implements OnInit {
           longitude,
           connectedTo,
         }).pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(t => console.log('🦓: СОЗДАНИЕ УСПЕШНО', t));
+          .subscribe(res => {
+            if (res) this.form.reset();
+          });
       }
     } else {
       Object.keys(this.form.controls).forEach(key => {
@@ -189,6 +194,12 @@ export class StationManagerPageComponent implements OnInit {
     this.stations.set(stations);
 
     const currentStation: Station | null = stations.find(station => station.id === stationId) ?? null;
+
+    if (stations.length && currentStation === null && this.stationId() !== null) {
+      this.alert.open('Станция с таким ID не найдена!', { appearance: 'error' }).subscribe();
+      this.router.navigate(['/admin/stations']);
+    }
+
     this.activeCurrentStation.set(currentStation);
     this.form.controls.connectedTo.clear();
 

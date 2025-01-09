@@ -1,4 +1,5 @@
 @let loading = loading$ | async;
+@let loadingInPage = loadingInPage$ | async;
 @let isRequiredControlCity = form.controls.city.invalid && form.controls.city.touched;
 @let isRequiredControlLatitude = form.controls.latitude.invalid && form.controls.latitude.touched;
 @let isRequiredControlLongitude = form.controls.longitude.invalid && form.controls.longitude.touched;
@@ -82,8 +83,20 @@
             </div>
           }
         </div>
-        <div *ngIf="form.errors?.['nonUnique']">Connected cities must be unique.</div>
-        <button appearance="accent" tuiButton type="submit">Сохранить</button>
+        <tui-loader
+          [inheritColor]="true"
+          [overlay]="true"
+          [showLoader]="!!loadingInPage"
+        >
+          <button
+            tuiButton
+            class="submit-button"
+            type="submit"
+            appearance="accent"
+          >
+            Сохранить
+          </button>
+        </tui-loader>
       </form>
 
       <app-map (clickMap)="onClickMap($event)" [initValueCoordinates]="{latitude: activeCurrentStation()?.latitude ?? 55.755702, longitude: activeCurrentStation()?.longitude ??  37.617531}" />
