@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, orderBy, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, getDoc, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { TuiAlertService } from '@taiga-ui/core';
-import { forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
+import { combineLatest, forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { LoaderService } from '../loader.service';
 import { Station } from '@interfaces/station.interface';
 import { StationEntity } from '@entitys/station.entity';
@@ -36,20 +36,12 @@ export class StationsFirestoreService {
     ) as Observable<Station[]>;
   }
 
-  public addStation(station: Omit<StationEntity, 'id'>): Observable<void[]> {
-    return from(addDoc(collection(this.db, 'stations'), station)).pipe(
-      switchMap((stationDocRef) => {
-        const updateId = from(updateDoc(stationDocRef, { id: stationDocRef.id }));
-        const updateConnectedTo = this.updateConnectedAfterUpdatingCurrentStation(
-          { id: stationDocRef.id, ...station },
-          station.connectedTo,
-        );
+  public addStation(station: Omit<StationEntity, 'id'>): Observable<(void | null)[]> {
+    const stationRef = collection(this.db, 'stations');
 
-        return forkJoin([updateId, updateConnectedTo]).pipe(
-          map(([idUpdateResult, connectionsUpdateResult]) => {
-            return [idUpdateResult, ...(connectionsUpdateResult || [])] as void[];
-          }),
-        );
+    return from(addDoc(stationRef, station)).pipe(
+      switchMap((docRef) => {
+        return this.updatedConnectedToAddStation(docRef.id, station.connectedTo);
       }),
     );
   }
@@ -82,6 +74,33 @@ export class StationsFirestoreService {
 
   public deleteStation(stationId: string): Observable<void> {
     return from(deleteDoc(doc(this.db, 'stations', stationId)));
+  }
+
+  private updatedConnectedToAddStation(stationId: string, connectedTo: { id: string, distance: number }[]): Observable<(void | null)[]> {
+    const updates = connectedTo.map(connStation => {
+      const connStationRef = doc(this.db, 'stations', connStation.id);
+
+      // Получим текущее состояние connectedTo для обновления
+      return from(getDoc(connStationRef)).pipe(
+        switchMap((docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const existingData = docSnapshot.data() as StationEntity;
+            const existingConnectedTo = existingData.connectedTo || [];
+
+            // Обновляем connectedTo добавлением ссылки на новую станцию
+            return from(updateDoc(connStationRef, {
+              connectedTo: [...existingConnectedTo, { id: stationId, distance: connStation.distance }],
+            }));
+          } else {
+            // Обработка случая, когда станция не найдена
+            this.alert.open(`Ошибка обновления данных станции с ID ${connStation.id} `);
+            return of(null); // или выбросьте ошибку
+          }
+        }),
+      );
+    });
+    // Подождем окончания всех обновлений
+    return combineLatest(updates);
   }
 
   private getAllEntity(): Observable<StationEntity[]> {
