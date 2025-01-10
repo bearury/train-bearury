@@ -13,9 +13,14 @@
     </div>
   } @else {
     <div class="content">
-      @for (station of stations; track station.id) {
-        <app-station-card [station]="station" (stationChange)="handleClickButtons($event)" />
+      @if (stations?.length) {
+        @for (station of stations; track station.id) {
+          <app-station-card [station]="station" (stationChange)="handleClickButtons($event)" />
+        }
+      } @else {
+        <h2 tuiTitle="m">Станции пока не добавлены!</h2>
       }
+
     </div>
   }
 </div>

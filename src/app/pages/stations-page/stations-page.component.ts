@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { TuiButton, TuiIcon, TuiLoader } from '@taiga-ui/core';
+import { TuiButton, TuiIcon, TuiLoader, TuiTitle } from '@taiga-ui/core';
 import { StationCardComponent } from '@components/station-card/station-card.component';
 import { Station } from '@interfaces/station.interface';
 import { LoaderService } from '@services/loader.service';
@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
     StationCardComponent,
     TuiButton,
     TuiIcon,
+    TuiTitle,
   ],
   templateUrl: './stations-page.component.html',
   styleUrl: './stations-page.component.less',
