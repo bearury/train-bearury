@@ -102,6 +102,14 @@ export class StationManagerPageComponent implements OnInit {
       const filteredArrayIsNullValueControls = value.filter(item => item !== null);
       this.mapService.addBalloons(filteredArrayIsNullValueControls);
     });
+
+    this.form.valueChanges.subscribe(() => {
+      if (this.form.controls.latitude.valid && this.form.controls.longitude.valid) {
+        this.setMainBalloonFromEditField();
+      } else {
+        this.mapService.removeMainBalloon();
+      }
+    });
   }
 
   public onClickMap(event: EmittedValueMap): void {
@@ -156,7 +164,6 @@ export class StationManagerPageComponent implements OnInit {
   public handleClickDelete(stationId: string | null, observer: PaymentResponse): void {
     this.processDeleteStation.set(true);
     if (stationId) {
-      console.log('[159] 🥕: ', this.processDeleteStation());
       this.stationsFirestoreService.deleteStation(stationId).subscribe(() => {
         observer.complete();
         this.router.navigate(['/admin/stations']);
@@ -180,11 +187,18 @@ export class StationManagerPageComponent implements OnInit {
     this.form.controls.connectedTo.removeAt(index);
   }
 
-
   protected showDialogDeleteButton(content: PolymorpheusContent<TuiDialogContext>): void {
     this.dialogs.open(content).subscribe();
   }
 
+  private setMainBalloonFromEditField(): void {
+    const { city, latitude, longitude } = this.form.value;
+    const tempStation: Station = {
+      id: this.mapService.TEMP_STATION_ID, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
+    };
+
+    this.mapService.setMainBalloon(tempStation);
+  }
 
   private setStateCurrentValue(city: string, latitude: number, longitude: number): void {
     const tempStation: Station = {
@@ -204,7 +218,6 @@ export class StationManagerPageComponent implements OnInit {
     const currentStation: Station | null = stations.find(station => station.id === stationId) ?? null;
 
     if (stations.length && currentStation === null && this.stationId() !== null && !this.processDeleteStation()) {
-      console.log('[206] 🍄: processDeleteStation', this.processDeleteStation());
       this.alert.open('Станция с таким ID не найдена!', { appearance: 'error' }).subscribe();
       this.stationId.set(null);
       this.router.navigate(['/admin/stations']);

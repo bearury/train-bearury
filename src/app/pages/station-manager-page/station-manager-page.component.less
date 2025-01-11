@@ -1,3 +1,5 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+
 .container {
   margin-top: 1rem;
 
@@ -16,6 +18,10 @@
   gap: 1rem;
   flex-direction: row;
   margin-top: 1rem;
+
+  @media @tui-mobile {
+    flex-direction: column;
+  }
 }
 
 .form {
@@ -25,6 +31,11 @@
   border-radius: var(--tui-radius-l);
   padding: 1rem;
   background: var(--tui-background-elevation-3);
+
+  @media @tui-mobile {
+    inline-size: auto;
+    width: 100%;
+  }
 }
 
 
