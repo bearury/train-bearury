@@ -69,6 +69,7 @@
                     *tuiDataList
                     [itemContent]="cardContent"
                     [items]="stations()"
+                    emptyContent="Станции еще не добавлены!"
                   />
                 </tui-select>
                 <button (click)="handleRemoveConnectedTo(index)" appearance="floating" size="s" tuiButton type="button">
@@ -88,14 +89,23 @@
           [overlay]="true"
           [showLoader]="!!loadingInPage"
         >
-          <button
-            tuiButton
-            class="submit-button"
-            type="submit"
-            appearance="accent"
-          >
-            Сохранить
-          </button>
+          <div class="wrapper-loader-button">
+            <button
+              tuiButton
+              class="submit-button"
+              type="submit"
+              appearance="positive"
+            >
+              Сохранить
+            </button>
+
+            @if (stationId()) {
+              <button tuiButton type="button" appearance="outline-destructive" (click)="showDialogDeleteButton(dialogContent)">
+                <tui-icon icon="@tui.trash-2" />
+              </button>
+            }
+          </div>
+
         </tui-loader>
       </form>
 
@@ -112,4 +122,34 @@
   <div class="card-item">
     {{ item.city }}
   </div>
+</ng-template>
+
+<ng-template #dialogContent class="dialog" let-observer>
+  <h3 class="dialog__title">Внимание!</h3>
+  <div class="dialog__main">
+    <div>Удаление станции, так же удалит её связи с другими станциями</div>
+    <div><strong>Восстановление будет невозможным!</strong></div>
+  </div>
+
+  <div class="dialog__button-group">
+    <button
+      (click)="observer.complete()"
+      size="m"
+      tuiButton
+      type="button"
+    >
+      Отмена
+    </button>
+    <button
+      (click)="handleClickDelete(stationId(), observer)"
+      appearance="accent"
+      size="m"
+      tuiButton
+      type="button"
+    >
+      Удалить
+    </button>
+  </div>
+
+
 </ng-template>

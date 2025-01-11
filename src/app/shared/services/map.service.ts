@@ -43,6 +43,11 @@ export class MapService {
     this._balloons$.next([...connectedToStations, balloon]);
   }
 
+  public removeMainBalloon(): void {
+    const connectedToStations = this.balloons.filter((balloon) => balloon.id !== this.TEMP_STATION_ID);
+    this._balloons$.next([...connectedToStations]);
+  }
+
   public clearBalloons(): void {
     this._balloons$.next([]);
   }
@@ -50,4 +55,6 @@ export class MapService {
   private removeAllConnectedToBalloon(): void {
     this._balloons$.next(this.balloons.filter((balloon) => balloon.id === this.TEMP_STATION_ID));
   }
+
+
 }

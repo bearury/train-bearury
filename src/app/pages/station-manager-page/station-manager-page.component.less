@@ -1,3 +1,5 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+
 .container {
   margin-top: 1rem;
 
@@ -16,6 +18,10 @@
   gap: 1rem;
   flex-direction: row;
   margin-top: 1rem;
+
+  @media @tui-mobile {
+    flex-direction: column;
+  }
 }
 
 .form {
@@ -25,6 +31,11 @@
   border-radius: var(--tui-radius-l);
   padding: 1rem;
   background: var(--tui-background-elevation-3);
+
+  @media @tui-mobile {
+    inline-size: auto;
+    width: 100%;
+  }
 }
 
 
@@ -64,8 +75,36 @@
 
 }
 
-.submit-button {
+.wrapper-loader-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
   width: 100%;
+}
+
+.submit-button {
+  flex: 1;
+  margin-right: auto;
+}
+
+.dialog {
+
+  &__title {
+    color: var(--tui-text-negative);
+  }
+
+  &__main {
+    margin: 1rem 0;
+  }
+
+  &__button-group {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 1rem;
+  }
 }
 
 

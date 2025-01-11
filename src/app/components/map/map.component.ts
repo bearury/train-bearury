@@ -18,14 +18,14 @@ export class MapComponent implements OnInit, AfterViewInit {
   public isEditMode = signal<boolean>(false);
   public mapService = inject(MapService);
   public balloons$ = this.mapService.balloons$;
+
   @Output() private clickMap = new EventEmitter<EmittedValueMap>();
   private isEditMode$ = this.mapService.isEditMode$;
-
   private hostElement = inject(ElementRef);
 
   public ngAfterViewInit(): void {
     // Костыль для перерерисовки карты при повторной отрисовке
-    this.hostElement.nativeElement.style.height = '30vh';
+    this.hostElement.nativeElement.style.minHeight = '30vh';
     this.hostElement.nativeElement.style.flex = '1 1 20%';
   }
 

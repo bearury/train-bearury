@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, getDoc, orderBy, query, updateDoc } from '@angular/fire/firestore';
 import { TuiAlertService } from '@taiga-ui/core';
-import { catchError, combineLatest, from, map, merge, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, combineLatest, forkJoin, from, map, merge, Observable, of, switchMap, tap } from 'rxjs';
 import { LoaderService } from '../loader.service';
 import { Station } from '@interfaces/station.interface';
 import { StationEntity } from '@entitys/station.entity';
@@ -10,8 +10,6 @@ import { LoaderInPageService } from '@services/loader-in-page.service';
 
 @Injectable({
   providedIn: 'root',
-
-
 })
 export class StationsFirestoreService {
   private readonly db = inject(Firestore);
@@ -30,7 +28,7 @@ export class StationsFirestoreService {
           return {
             ...station,
             connectedTo: station.connectedTo.map((connected) => ({
-              name: stations.find(st => st.id === connected.id)?.city ?? 'test',
+              name: stations.find(st => st.id === connected.id)?.city ?? 'Ошибка!',
               distance: connected.distance,
             })),
           };
@@ -46,13 +44,17 @@ export class StationsFirestoreService {
 
     return from(addDoc(stationRef, station)).pipe(
       switchMap((docRef) => {
+
         const updateStation = from(updateDoc(docRef, { id: docRef.id }));
-        const update = this.updatedConnectedToAddStation(docRef.id, station.connectedTo);
-        return merge(updateStation, update).pipe(map(() => docRef.id));
+        const update = station.connectedTo.length
+          ? this.updatedConnectedToAddStation(docRef.id, station.connectedTo)
+          : of(null);
+        return forkJoin([updateStation, update]).pipe(map(() => docRef.id));
       }),
-      tap(() => {
+      tap((id) => {
         this.alert.open('Станция успешно создана!').subscribe();
         this.loaderInPageService.hide();
+        return of(id);
       }),
       catchError(err => {
         this.alert.open('Ошибка создания станции!', err).subscribe();
@@ -135,15 +137,70 @@ export class StationsFirestoreService {
   }
 
   public getStationById(stationId: string): Observable<StationEntity | null> {
-    const userRef = doc(this.db, 'stations', stationId);
-    return docData(userRef, { idField: 'id' }).pipe(
+    const stationsRef = doc(this.db, 'stations', stationId);
+    return docData(stationsRef, { idField: 'id' }).pipe(
       map((station) => station as StationEntity),
       map((data) => (data ? data : null)),
     );
   }
 
-  public deleteStation(stationId: string): Observable<void> {
-    return from(deleteDoc(doc(this.db, 'stations', stationId)));
+  public deleteStation(stationId: string): Observable<null> {
+
+    this.loaderInPageService.show();
+
+    const connStationRef = doc(this.db, 'stations', stationId);
+
+
+    return from(getDoc(connStationRef)).pipe(
+      switchMap((docSnapshot) => {
+
+        const del = deleteDoc(doc(this.db, 'stations', stationId));
+        const existingData = docSnapshot.data() as StationEntity;
+        return from(del).pipe(map(() => existingData));
+      }),
+      switchMap((docSnapshot) => {
+
+        if (!docSnapshot.connectedTo.length) return of(null);
+
+        const updates = docSnapshot.connectedTo.map(connStation => {
+          const connStationRef = doc(this.db, 'stations', connStation.id);
+
+          return from(getDoc(connStationRef)).pipe(
+            switchMap((docSnapshot) => {
+
+
+              if (docSnapshot.exists()) {
+                const existingData = docSnapshot.data() as StationEntity;
+                const existingConnectedTo = existingData.connectedTo || [];
+
+                const connectedTo = existingConnectedTo.filter(connStation => connStation.id !== stationId);
+
+                // Обновляем connectedTo добавлением ссылки на новую станцию
+                return from(updateDoc(connStationRef, {
+                  connectedTo,
+                }));
+              } else {
+                // Обработка случая, когда станция не найдена
+                this.alert.open(`Ошибка обновления данных станции с ID ${connStation.id} `);
+                return of(null); // или выбросьте ошибку
+              }
+            }),
+          );
+        });
+
+        return combineLatest(updates).pipe(map(() => null));
+
+      }),
+      tap(() => {
+        this.alert.open('Станция удалена!').subscribe();
+        this.loaderInPageService.hide();
+        return of(null);
+      }),
+      catchError(() => {
+        this.alert.open('Ошибка создания станции!', { appearance: 'warning' }).subscribe();
+        this.loaderInPageService.hide();
+        return of(null);
+      }));
   }
 
   private updatedConnectedToAddStation(stationId: string, connectedTo: { id: string, distance: number }[]): Observable<(void | null)[]> {

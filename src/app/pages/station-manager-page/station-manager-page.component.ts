@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiAlertService, TuiButton, TuiError, TuiIcon, TuiLabel, TuiLoader, TuiScrollable, TuiTextfieldComponent, TuiTextfieldDirective, TuiTitle } from '@taiga-ui/core';
+import { TuiAlertService, TuiButton, TuiDialogContext, TuiDialogService, TuiError, TuiIcon, TuiLabel, TuiLoader, TuiScrollable, TuiTextfieldComponent, TuiTextfieldDirective, TuiTitle } from '@taiga-ui/core';
 import { TuiForm } from '@taiga-ui/layout';
 import { TuiInputNumberModule, TuiSelectModule, TuiTextfieldControllerModule } from '@taiga-ui/legacy';
 import { AngularYandexMapsModule } from 'angular8-yandex-maps';
@@ -18,6 +18,8 @@ import { EmittedValueMap } from '@interfaces/emitted-value-map.interface';
 import { MapService } from '@services/map.service';
 import { uniqueValuesValidator } from '../../shared/helpers/unique-values.validator';
 import { LoaderInPageService } from '@services/loader-in-page.service';
+import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
+import { tap } from 'rxjs';
 
 
 @Component({
@@ -42,6 +44,7 @@ import { LoaderInPageService } from '@services/loader-in-page.service';
     TuiLoader,
     TuiError,
     TuiFieldErrorPipe,
+
   ],
   templateUrl: './station-manager-page.component.html',
   styleUrl: './station-manager-page.component.less',
@@ -70,14 +73,13 @@ export class StationManagerPageComponent implements OnInit {
 
   public stations = signal<Station[]>([]);
   public activeCurrentStation = signal<Station | null>(null);
+  public processDeleteStation = signal<boolean>(false);
   private mapService = inject(MapService);
-
   private readonly alert = inject(TuiAlertService);
+  private readonly dialogs = inject(TuiDialogService);
   private stationsFirestoreService = inject(StationsFirestoreService);
-
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
-
   private loaderService = inject(LoaderService);
   public loading$ = this.loaderService.loading$;
   private loaderInPageService = inject(LoaderInPageService);
@@ -100,8 +102,15 @@ export class StationManagerPageComponent implements OnInit {
       const filteredArrayIsNullValueControls = value.filter(item => item !== null);
       this.mapService.addBalloons(filteredArrayIsNullValueControls);
     });
-  }
 
+    this.form.valueChanges.subscribe(() => {
+      if (this.form.controls.latitude.valid && this.form.controls.longitude.valid) {
+        this.setMainBalloonFromEditField();
+      } else {
+        this.mapService.removeMainBalloon();
+      }
+    });
+  }
 
   public onClickMap(event: EmittedValueMap): void {
     this.setStateCurrentValue(event.city, event.latitude, event.longitude);
@@ -129,10 +138,8 @@ export class StationManagerPageComponent implements OnInit {
           latitude,
           longitude,
           connectedTo,
-        }).pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(res => {
-            if (res) this.form.reset();
-          });
+        }).pipe(takeUntilDestroyed(this.destroyRef), tap(() => this.form.reset()))
+          .subscribe();
       }
     } else {
       Object.keys(this.form.controls).forEach(key => {
@@ -154,6 +161,16 @@ export class StationManagerPageComponent implements OnInit {
     }
   }
 
+  public handleClickDelete(stationId: string | null, observer: PaymentResponse): void {
+    this.processDeleteStation.set(true);
+    if (stationId) {
+      this.stationsFirestoreService.deleteStation(stationId).subscribe(() => {
+        observer.complete();
+        this.router.navigate(['/admin/stations']);
+      });
+    }
+  }
+
   public getNameFromStation(station: Station): string {
     return station.city;
   }
@@ -168,6 +185,19 @@ export class StationManagerPageComponent implements OnInit {
 
   public handleRemoveConnectedTo(index: number): void {
     this.form.controls.connectedTo.removeAt(index);
+  }
+
+  protected showDialogDeleteButton(content: PolymorpheusContent<TuiDialogContext>): void {
+    this.dialogs.open(content).subscribe();
+  }
+
+  private setMainBalloonFromEditField(): void {
+    const { city, latitude, longitude } = this.form.value;
+    const tempStation: Station = {
+      id: this.mapService.TEMP_STATION_ID, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
+    };
+
+    this.mapService.setMainBalloon(tempStation);
   }
 
   private setStateCurrentValue(city: string, latitude: number, longitude: number): void {
@@ -187,7 +217,7 @@ export class StationManagerPageComponent implements OnInit {
 
     const currentStation: Station | null = stations.find(station => station.id === stationId) ?? null;
 
-    if (stations.length && currentStation === null && this.stationId() !== null) {
+    if (stations.length && currentStation === null && this.stationId() !== null && !this.processDeleteStation()) {
       this.alert.open('Станция с таким ID не найдена!', { appearance: 'error' }).subscribe();
       this.stationId.set(null);
       this.router.navigate(['/admin/stations']);

@@ -1,3 +1,5 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+
 .loader {
   margin-top: 3.125rem;
 }
@@ -8,4 +10,19 @@
 
 .content {
   margin-top: .5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+
 }
+
+@media @tui-desktop {
+  .content {
+    justify-content: center !important;
+  }
+}
+
+
