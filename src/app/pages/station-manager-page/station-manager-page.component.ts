@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiAlertService, TuiButton, TuiDialogContext, TuiDialogService, TuiError, TuiIcon, TuiLabel, TuiLoader, TuiScrollable, TuiTextfieldComponent, TuiTextfieldDirective, TuiTitle } from '@taiga-ui/core';
@@ -20,6 +20,7 @@ import { uniqueValuesValidator } from '../../shared/helpers/unique-values.valida
 import { LoaderInPageService } from '@services/loader-in-page.service';
 import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
 import { tap } from 'rxjs';
+import { STATION_TEMP_ID } from '../../shared/tokens/station-temp-id.token';
 
 
 @Component({
@@ -85,6 +86,11 @@ export class StationManagerPageComponent implements OnInit {
   private loaderInPageService = inject(LoaderInPageService);
   public loadingInPage$ = this.loaderInPageService.loading$;
   private readonly destroyRef = inject(DestroyRef);
+
+  constructor(
+    @Inject(STATION_TEMP_ID) private stationTempId: string,
+  ) {
+  }
 
   public ngOnInit(): void {
     const param = this.activatedRoute.snapshot.paramMap.get('stationId');
@@ -194,7 +200,7 @@ export class StationManagerPageComponent implements OnInit {
   private setMainBalloonFromEditField(): void {
     const { city, latitude, longitude } = this.form.value;
     const tempStation: Station = {
-      id: this.mapService.TEMP_STATION_ID, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
+      id: this.stationTempId, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
     };
 
     this.mapService.setMainBalloon(tempStation);
@@ -202,7 +208,7 @@ export class StationManagerPageComponent implements OnInit {
 
   private setStateCurrentValue(city: string, latitude: number, longitude: number): void {
     const tempStation: Station = {
-      id: this.mapService.TEMP_STATION_ID, city, latitude, longitude, connectedTo: [],
+      id: this.stationTempId, city, latitude, longitude, connectedTo: [],
     };
 
     this.mapService.setMainBalloon(tempStation);

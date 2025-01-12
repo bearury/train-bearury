@@ -1,0 +1,58 @@
+<div #formContainer
+     class="create-carriages__container">
+  <button (click)="onShowForm()"
+          class="button-create"
+          type="button">Create
+  </button>
+
+  @if (showForm) {
+
+    <form [formGroup]="form" class="form-create">
+
+    </form>
+
+    <div class="list-carriage-container">
+      @if (carriageVM()) {
+        <div class="carriage-wrapper">
+          <h4>{{ carriageVM()?.name }}</h4>
+
+          <!--          <div class="seats-wrapper" tuiCardLarge>-->
+          <div tuiCardMedium>
+
+            <div class="line">
+              <p class="text">Rows</p>
+              <div class="title__columns">
+                @for (title of Array.constructor(carriageVM()?.columnsCount); track $index) {
+                  <div class="title__numbers">{{ $index + 1 }}</div>
+                }
+              </div>
+            </div>
+
+            <div class="block__seats">
+              @for (carriageRow of carriageVM()?.rows; track carriageRow; let rowIndex = $index) {
+                <div class="carriage-row"
+                     [class.with-divider]="carriageVM()?.dividerIndex === rowIndex">
+                  @for (item of carriageRow; track item.index; let itemIndex = $index) {
+                    <button type="button"
+                            class="car-cell"
+                            [class.button-item]="rowIndex > (carriageVM()?.dividerIndex ?? 0)">
+                      <span class="number">{{ item.index }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+
+
+  <div class="list-carriages-container">
+    @for (carriage of carriageService.carriagesFromResponseSignal(); track carriage; ) {
+      <app-carriage />
+    }
+  </div>
+</div>

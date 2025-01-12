@@ -25,7 +25,31 @@
 
   a {
     font-size: 1rem;
+    position: relative;
+
+
+    &:before {
+      content: '';
+      width: 0;
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+      height: 4px;
+      background: linear-gradient(to right, var(--app-linear-gradient-first), var(--app-linear-gradient-second));
+    }
   }
+
+  .active-link {
+    font-weight: bold;
+  }
+
+  .active-link:before {
+    transition: all 0.2s ease 0s;
+    width: 100%;
+  }
+
 }
 
 .button-theme {

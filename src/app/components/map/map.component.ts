@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, input, OnInit, Output, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, inject, input, OnInit, Output, signal } from '@angular/core';
 import { AngularYandexMapsModule, YaEvent, YaReadyEvent } from 'angular8-yandex-maps';
 import { MapService } from '@services/map.service';
 import { AsyncPipe } from '@angular/common';
 import { EmittedValueMap } from '@interfaces/emitted-value-map.interface';
+import { STATION_TEMP_ID } from '../../shared/tokens/station-temp-id.token';
 
 @Component({
   selector: 'app-map',
@@ -22,6 +23,9 @@ export class MapComponent implements OnInit, AfterViewInit {
   @Output() private clickMap = new EventEmitter<EmittedValueMap>();
   private isEditMode$ = this.mapService.isEditMode$;
   private hostElement = inject(ElementRef);
+
+  constructor(@Inject(STATION_TEMP_ID) public stationTempId: string) {
+  }
 
   public ngAfterViewInit(): void {
     // Костыль для перерерисовки карты при повторной отрисовке

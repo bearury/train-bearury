@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthPageComponent } from '@pages/auth-page/auth-page.component';
 import { StationsPageComponent } from '@pages/stations-page/stations-page.component';
 import { StationManagerPageComponent } from '@pages/station-manager-page/station-manager-page.component';
+import { CarriagesManagerPageComponent } from '@pages/carriages-manager-page/carriages-manager-page.component';
 
 export const routes: Routes = [
   {
@@ -31,6 +32,10 @@ export const routes: Routes = [
             component: StationManagerPageComponent,
           },
         ],
+      },
+      {
+        path: 'carriages',
+        component: CarriagesManagerPageComponent,
       },
     ],
   },
