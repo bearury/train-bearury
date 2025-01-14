@@ -1,58 +1,82 @@
-<div #formContainer
-     class="create-carriages__container">
-  <button (click)="onShowForm()"
-          class="button-create"
-          type="button">Create
-  </button>
+@let carriage = currentCarriage();
 
-  @if (showForm) {
+<div class="create-carriages__container">
 
-    <form [formGroup]="form" class="form-create">
 
-    </form>
-
-    <div class="list-carriage-container">
-      @if (carriageVM()) {
-        <div class="carriage-wrapper">
-          <h4>{{ carriageVM()?.name }}</h4>
-
-          <!--          <div class="seats-wrapper" tuiCardLarge>-->
-          <div tuiCardMedium>
-
-            <div class="line">
-              <p class="text">Rows</p>
-              <div class="title__columns">
-                @for (title of Array.constructor(carriageVM()?.columnsCount); track $index) {
-                  <div class="title__numbers">{{ $index + 1 }}</div>
-                }
-              </div>
-            </div>
-
-            <div class="block__seats">
-              @for (carriageRow of carriageVM()?.rows; track carriageRow; let rowIndex = $index) {
-                <div class="carriage-row"
-                     [class.with-divider]="carriageVM()?.dividerIndex === rowIndex">
-                  @for (item of carriageRow; track item.index; let itemIndex = $index) {
-                    <button type="button"
-                            class="car-cell"
-                            [class.button-item]="rowIndex > (carriageVM()?.dividerIndex ?? 0)">
-                      <span class="number">{{ item.index }}</span>
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      }
-    </div>
+  @if (carriage) {
+    <app-carriage [carriage]="carriage" />
   }
 
+  <form [formGroup]="form" class="form">
+    <tui-textfield>
+      <label for="name" tuiLabel>Название</label>
+      <input [formControl]="form.controls.name"
+             id="name"
+             tuiTextfield
+             type="text"
+      />
+    </tui-textfield>
+
+    <tui-textfield>
+      <label for="rows" tuiLabel>Количество рядов</label>
+      <input [formControl]="form.controls.rows"
+             id="rows"
+             maxlength="2"
+             tuiInputNumber
+      />
+    </tui-textfield>
+
+    <div class="inputs-block-wrapper">
+      <div class="input-block">
+        <tui-textfield>
+          <label for="leftSeats" tuiLabel>Количество мест слева</label>
+          <input [formControl]="form.controls.leftSeats"
+                 id="leftSeats"
+                 maxlength="1"
+                 tuiInputNumber
+          />
+        </tui-textfield>
+
+        <tui-textfield>
+          <label for="rightSeats" tuiLabel>Количество мест справа</label>
+          <input [formControl]="form.controls.rightSeats"
+                 id="rightSeats"
+                 maxlength="1"
+                 tuiInputNumber
+          />
+        </tui-textfield>
+      </div>
+
+      <div class="input-block">
+        <tui-textfield>
+          <label for="backRightSeats" tuiLabel>Ряды справа с обратным расположением кресел</label>
+          <input [formControl]="form.controls.backRightSeats"
+                 id="backRightSeats"
+                 maxlength="2"
+                 tuiInputNumber
+          />
+        </tui-textfield>
 
 
-  <div class="list-carriages-container">
-    @for (carriage of carriageService.carriagesFromResponseSignal(); track carriage; ) {
-      <app-carriage />
-    }
-  </div>
+        <tui-textfield>
+          <label for="backLeftSeats" tuiLabel>Ряды справа с обратным расположением кресел</label>
+          <input [formControl]="form.controls.backLeftSeats"
+                 id="backLeftSeats"
+                 maxlength="1"
+                 tuiInputNumber
+          />
+        </tui-textfield>
+
+      </div>
+    </div>
+
+    <button appearance="outline" class="submit-button" tuiButton type="submit">
+      Создать
+    </button>
+  </form>
 </div>
+
+
+
+
+

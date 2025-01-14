@@ -1,31 +1,25 @@
 <div class="carriage-wrapper">
   <h4>{{ carriage().name }}</h4>
 
-
   <div class="seats-wrapper">
     <div class="line">
-      <p class="text">Rows</p>
-      <div class="title__columns">
-        @for (i of [].constructor(carriage().matrixIndexSeats[0].length); track index; let index = $index) {
-          <div class="title__numbers">{{ index + 1 }}</div>
-        }
-      </div>
+      <h2 tuiTitle="s">Ряды</h2>
     </div>
 
     <div class="block__seats">
       @for (carriageRow of carriage().matrixIndexSeats; track carriageRow; let rowIndex = $index) {
-
         <div class="carriage-row"
              [class.with-divider]="carriage().rightSeats - 1 === rowIndex">
           @for (item of carriageRow; track item; let i = $index) {
+            <div class="row-index-wrapper">
+              @if (rowIndex === 0) {
+                <div class="row-index">{{ i + 1 }}</div>
+              }
+            </div>
             <app-carriage-cell [backSeat]="i % 2 === 0" [numberSeat]="item" />
           }
         </div>
       }
     </div>
   </div>
-  <button (click)="onUpdate(carriage())"
-          class="button-update"
-          type="button">Update
-  </button>
 </div>

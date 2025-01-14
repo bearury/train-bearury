@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Carriage, CarriageVM } from '@interfaces/carriage.interface';
+import { Carriage, Carriage2, CarriageVM } from '@interfaces/carriage.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +16,12 @@ export class CarriageService {
     rightSeats: 2,
   }]);
 
+
+  public currentCarriage = signal<Carriage2 | null>(null);
+
+  public updateCurrentCarriage = (carriage: Omit<Carriage2, 'matrixIndexSeats'>): void => {
+    this.currentCarriage.set(this.buildCurrentCarriage(carriage));
+  };
 
   public buildCarriageToVM = (carriage: Carriage): CarriageVM => {
     const { id, name, rows, leftSeats, rightSeats } = carriage;
@@ -40,4 +46,16 @@ export class CarriageService {
       rightSeats,
     };
   };
+
+  private buildCurrentCarriage({ id, name, leftSeats, rightSeats, backRightSeats, backLeftSeats }: Omit<Carriage2, 'matrixIndexSeats'>): Carriage2 {
+    return {
+      id,
+      name,
+      leftSeats,
+      rightSeats,
+      backRightSeats,
+      backLeftSeats,
+      matrixIndexSeats: [],
+    };
+  }
 }

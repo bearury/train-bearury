@@ -1,74 +1,77 @@
-import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, Inject, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Carriage, CarriageVM } from '@interfaces/carriage.interface';
+import { Carriage2, CarriageVM } from '@interfaces/carriage.interface';
 import { CarriageService } from '@services/carriage.service';
 import { CarriageForm } from '@interfaces/carriage-form.interface';
-import { TuiCardMedium } from '@taiga-ui/layout';
 import { CarriageComponent } from '@components/carriage/carriage.component';
+import { TuiInputNumber } from '@taiga-ui/kit';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TuiBreakpointService, TuiButton, TuiLabel, TuiTextfieldComponent, TuiTextfieldDirective } from '@taiga-ui/core';
+import { map } from 'rxjs';
+import { TuiInputNumberModule } from '@taiga-ui/legacy';
 
 @Component({
   selector: 'app-carriages-manager-page',
   imports: [
     ReactiveFormsModule,
-    TuiCardMedium,
     CarriageComponent,
+    TuiLabel,
+    TuiTextfieldComponent,
+    TuiTextfieldDirective,
+    TuiInputNumberModule,
+    TuiInputNumber,
+    TuiButton,
   ],
   templateUrl: './carriages-manager-page.component.html',
   styleUrl: './carriages-manager-page.component.less',
 })
 export class CarriagesManagerPageComponent implements OnInit {
 
-  public showForm = false;
-  public carriageVM = signal<CarriageVM | null>(null);
-  public isUpdating = false;
-  @ViewChild('formContainer') public formContainer!: ElementRef;
+
+  // public carriageVM = signal<CarriageVM | null>(null);
+
 
   public form = new FormGroup<CarriageForm>({
       name: new FormControl('', [Validators.required]),
       rows: new FormControl('', [Validators.required, Validators.min(1), Validators.max(20)]),
-      leftSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(5)]),
-      rightSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(5)]),
+      leftSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
+      rightSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
+      backLeftSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
+      backRightSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
     }, { updateOn: 'change' },
   );
+  public currentCarriage = signal<Carriage2 | null>(null);
   protected readonly Array = Array;
+  protected open = signal(false);
+  protected readonly isMobile = toSignal(
+    inject(TuiBreakpointService).pipe(map((size) => size === 'mobile')),
+  );
 
-  constructor(protected carriageService: CarriageService) {
+  constructor(@Inject(CarriageService) private carriageService: CarriageService) {
+    this.currentCarriage.set(this.carriageService.currentCarriage());
   }
 
   public ngOnInit(): void {
-    // this.carriageService.getCarriages();
-
-    // this.form = this.fb.group({
-    //   name: ['', Validators.required],
-    //   rows: ['', [Validators.required, Validators.min(1), Validators.max(20)]],
-    //   leftSeats: ['', [Validators.required, Validators.min(1), Validators.max(5)]],
-    //   rightSeats: ['', [Validators.required, Validators.min(1), Validators.max(5)]],
-    // });
 
     this.form.valueChanges.subscribe((value) => {
-      if ((this.form.value.rows && +this.form.value.rows <= 20)
-        && (this.form.value.leftSeats && +this.form.value.leftSeats <= 5)
-        && (this.form.value.rightSeats && +this.form.value.rightSeats <= 5)) {
-        const carriage: Carriage = {
+
+
+      const { rows, leftSeats, rightSeats, backLeftSeats, backRightSeats } = this.form.controls;
+
+      if (rows.valid || leftSeats.valid || rightSeats.valid || backLeftSeats.valid || backRightSeats.valid) {
+        const carriage: Omit<Carriage2, 'matrixIndexSeats'> = {
           name: value.name ?? '',
           id: '1',
-          rows: +(value.rows ?? 0),
+          backRightSeats: [],
+          backLeftSeats: [],
           leftSeats: +(value.leftSeats ?? 0),
           rightSeats: +(value.rightSeats ?? 0),
         };
-        this.carriageVM.set(this.carriageService.buildCarriageToVM(carriage));
-      } else {
-        this.carriageVM.set(null);
+        this.carriageService.updateCurrentCarriage(carriage);
       }
     });
   }
 
-  public onShowForm(): void {
-    this.showForm = !this.showForm;
-    this.form.reset();
-    this.carriageVM.set(null);
-    this.isUpdating = false;
-  }
 
   public onSave(): void {
     if (this.form.valid) {
@@ -128,14 +131,16 @@ export class CarriagesManagerPageComponent implements OnInit {
   }
 
   public onUpdate(carriage: CarriageVM): void {
-    this.isUpdating = true;
-    this.showForm = true;
-    this.form.setValue({
-      name: carriage.name,
-      rows: carriage.columnsCount.toString(),
-      leftSeats: carriage.leftSeats?.toString() ?? '',
-      rightSeats: carriage.rightSeats?.toString() ?? '',
-    });
-    this.formContainer.nativeElement.scrollIntoView({ behavior: 'smooth' });
+
+    console.log('⭐: ', carriage);
+
+
+    // this.form.setValue({
+    //   name: carriage.name,
+    //   rows: carriage.columnsCount.toString(),
+    //   leftSeats: carriage.leftSeats?.toString() ?? '',
+    //   rightSeats: carriage.rightSeats?.toString() ?? '',
+    // });
+
   }
 }

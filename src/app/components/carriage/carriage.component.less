@@ -1,27 +1,17 @@
 .seats-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: fit-content;
   padding: 1rem;
   border: 0.2rem solid #6b6969;
   border-radius: 1rem;
-  margin-bottom: 0.625rem;
+  margin: 1rem 0;
+  box-shadow: var(--tui-shadow-small);
 }
 
 .line {
   display: flex;
-  align-items: center;
-}
-
-.text {
-  text-align: center;
-  margin: 0;
-}
-
-.title__columns {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+  margin-top: -0.6rem;
 }
 
 .title__numbers {
@@ -47,12 +37,32 @@
 .block__seats {
   display: flex;
   flex-direction: column;
-  padding-left: 2.5rem;
+  padding-left: .5rem;
+  padding-top: 1rem;
 }
 
 .carriage-row {
   display: flex;
   gap: 0;
+
+}
+
+.row-index-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.row-index {
+  position: absolute;
+  width: 1.8rem;
+  height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: -1.8rem;
+  left: 1.25rem;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .with-divider {
@@ -61,6 +71,3 @@
   border-bottom: 0.125rem solid #d7d4d4;
 }
 
-.button-update {
-  width: fit-content;
-}

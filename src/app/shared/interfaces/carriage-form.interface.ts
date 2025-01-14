@@ -5,4 +5,6 @@ export interface CarriageForm {
   readonly rows: FormControl<string | null>;
   readonly leftSeats: FormControl<string | null>;
   readonly rightSeats: FormControl<string | null>;
+  readonly backLeftSeats: FormControl<string | null>;
+  readonly backRightSeats: FormControl<string | null>;
 }
