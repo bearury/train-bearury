@@ -4,12 +4,16 @@
   <div class="seats-wrapper">
     <div class="line">
       <h2 tuiTitle="s">Ряды</h2>
+
+      {{ carriage().rightSeats ?? 0 - 1 }}
     </div>
 
     <div class="block__seats">
       @for (carriageRow of carriage().matrixIndexSeats; track carriageRow; let rowIndex = $index) {
+
+
         <div class="carriage-row"
-             [class.with-divider]="carriage().rightSeats - 1 === rowIndex">
+             [class.with-divider]="(carriage().rightSeats ?? 0 - 1) === rowIndex">
           @for (item of carriageRow; track item; let i = $index) {
             <div class="row-index-wrapper">
               @if (rowIndex === 0) {

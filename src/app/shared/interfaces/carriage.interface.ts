@@ -19,12 +19,21 @@ export interface CarriageVM {
 
 export interface Carriage2 {
   readonly id: string;
-  readonly name: string;
+  readonly name: string | null;
   readonly matrixIndexSeats: number[][];
-  readonly leftSeats: number;
-  readonly rightSeats: number;
+  readonly leftSeats: number | null;
+  readonly rightSeats: number | null;
   readonly backRightSeats: number[];
   readonly backLeftSeats: number[];
+}
+
+export interface CarriageFormData {
+  readonly name: string | null;
+  readonly rows: number | null;
+  readonly leftSeats: number | null;
+  readonly rightSeats: number | null;
+  readonly backLeftSeats: number[];
+  readonly backRightSeats: number[];
 }
 
 export interface SeatVM {

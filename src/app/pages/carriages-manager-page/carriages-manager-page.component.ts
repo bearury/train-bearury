@@ -1,14 +1,14 @@
-import { Component, Inject, inject, OnInit, signal } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Carriage2, CarriageVM } from '@interfaces/carriage.interface';
+import { Carriage2, CarriageFormData, CarriageVM } from '@interfaces/carriage.interface';
 import { CarriageService } from '@services/carriage.service';
 import { CarriageForm } from '@interfaces/carriage-form.interface';
 import { CarriageComponent } from '@components/carriage/carriage.component';
 import { TuiInputNumber } from '@taiga-ui/kit';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { TuiBreakpointService, TuiButton, TuiLabel, TuiTextfieldComponent, TuiTextfieldDirective } from '@taiga-ui/core';
-import { map } from 'rxjs';
-import { TuiInputNumberModule } from '@taiga-ui/legacy';
+import { TuiButton, TuiLabel, TuiTextfieldComponent, TuiTextfieldDirective } from '@taiga-ui/core';
+import { TuiInputNumberModule, TuiMultiSelectModule, TuiTextfieldControllerModule } from '@taiga-ui/legacy';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-carriages-manager-page',
@@ -21,54 +21,47 @@ import { TuiInputNumberModule } from '@taiga-ui/legacy';
     TuiInputNumberModule,
     TuiInputNumber,
     TuiButton,
+    TuiMultiSelectModule,
+    TuiTextfieldControllerModule,
+    AsyncPipe,
+
+
   ],
   templateUrl: './carriages-manager-page.component.html',
   styleUrl: './carriages-manager-page.component.less',
+  standalone: true,
 })
 export class CarriagesManagerPageComponent implements OnInit {
-
-
-  // public carriageVM = signal<CarriageVM | null>(null);
-
-
   public form = new FormGroup<CarriageForm>({
       name: new FormControl('', [Validators.required]),
-      rows: new FormControl('', [Validators.required, Validators.min(1), Validators.max(20)]),
-      leftSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
-      rightSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
-      backLeftSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
-      backRightSeats: new FormControl('', [Validators.required, Validators.min(1), Validators.max(9)]),
+      rows: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(20)]),
+      leftSeats: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(9)]),
+      rightSeats: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(9)]),
+      backLeftSeats: new FormControl(null),
+      backRightSeats: new FormControl(null),
     }, { updateOn: 'change' },
   );
-  public currentCarriage = signal<Carriage2 | null>(null);
-  protected readonly Array = Array;
-  protected open = signal(false);
-  protected readonly isMobile = toSignal(
-    inject(TuiBreakpointService).pipe(map((size) => size === 'mobile')),
-  );
+  // public currentCarriage = signal<Carriage2 | null>(null);
+
+  public currentCarriage$: Observable<Carriage2 | null>;
 
   constructor(@Inject(CarriageService) private carriageService: CarriageService) {
-    this.currentCarriage.set(this.carriageService.currentCarriage());
+    this.currentCarriage$ = carriageService.currentCarriage$;
+
+    console.log('[51] 🐬: ', this.currentCarriage$.subscribe(t => console.log('[51] 🍄: ', t)));
   }
 
   public ngOnInit(): void {
-
     this.form.valueChanges.subscribe((value) => {
-
-
-      const { rows, leftSeats, rightSeats, backLeftSeats, backRightSeats } = this.form.controls;
-
-      if (rows.valid || leftSeats.valid || rightSeats.valid || backLeftSeats.valid || backRightSeats.valid) {
-        const carriage: Omit<Carriage2, 'matrixIndexSeats'> = {
-          name: value.name ?? '',
-          id: '1',
-          backRightSeats: [],
-          backLeftSeats: [],
-          leftSeats: +(value.leftSeats ?? 0),
-          rightSeats: +(value.rightSeats ?? 0),
-        };
-        this.carriageService.updateCurrentCarriage(carriage);
-      }
+      const carriage: CarriageFormData = {
+        name: value.name ?? '',
+        rows: value.rows ?? null,
+        backRightSeats: value.backRightSeats ?? [],
+        backLeftSeats: value.backLeftSeats ?? [],
+        leftSeats: +(value.leftSeats ?? 0),
+        rightSeats: +(value.rightSeats ?? 0),
+      };
+      this.carriageService.updateCurrentCarriage(carriage);
     });
   }
 

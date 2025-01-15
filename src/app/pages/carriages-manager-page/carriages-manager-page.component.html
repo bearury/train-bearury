@@ -1,4 +1,4 @@
-@let carriage = currentCarriage();
+@let carriage = currentCarriage$ | async;
 
 <div class="create-carriages__container">
 
@@ -48,24 +48,59 @@
       </div>
 
       <div class="input-block">
-        <tui-textfield>
-          <label for="backRightSeats" tuiLabel>Ряды справа с обратным расположением кресел</label>
-          <input [formControl]="form.controls.backRightSeats"
-                 id="backRightSeats"
-                 maxlength="2"
-                 tuiInputNumber
-          />
-        </tui-textfield>
+        <tui-multi-select
+          [editable]="false"
+          [formControl]="form.controls.backRightSeats"
+          [tuiDropdownMaxHeight]="300"
+          [tuiTextfieldCleaner]="true"
+        >
+          Ряды справа с обратным расположением кресел
+          <tui-data-list
+            *tuiDataList
+            emptyContent="Укажите количество рядов"
+            tuiDataListDropdownManager
+            tuiMultiSelectGroup
+          >
+            @if (form.controls.rows.valid) {
+              @for (t of [].constructor(form.controls.rows.value); track index; let index = $index) {
+                <button
+                  [value]="index + 1"
+                  tuiOption
+                  type="button"
+                >
+                  {{ index + 1 }}
+                </button>
+              }
+            }
+          </tui-data-list>
+        </tui-multi-select>
 
-
-        <tui-textfield>
-          <label for="backLeftSeats" tuiLabel>Ряды справа с обратным расположением кресел</label>
-          <input [formControl]="form.controls.backLeftSeats"
-                 id="backLeftSeats"
-                 maxlength="1"
-                 tuiInputNumber
-          />
-        </tui-textfield>
+        <tui-multi-select
+          [editable]="false"
+          [formControl]="form.controls.backLeftSeats"
+          [tuiDropdownMaxHeight]="300"
+          [tuiTextfieldCleaner]="true"
+          [tuiTextfieldLabelOutside]="true"
+        >
+          Ряды слева с обратным расположением кресел
+          <tui-data-list
+            *tuiDataList
+            emptyContent="Укажите количество рядов"
+            tuiMultiSelectGroup
+          >
+            @if (form.controls.rows.valid) {
+              @for (_ of [].constructor(form.controls.rows.value); track index; let index = $index) {
+                <button
+                  [value]="index  + 1"
+                  tuiOption
+                  type="button"
+                >
+                  {{ index + 1 }}
+                </button>
+              }
+            }
+          </tui-data-list>
+        </tui-multi-select>
 
       </div>
     </div>

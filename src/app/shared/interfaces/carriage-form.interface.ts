@@ -2,9 +2,9 @@ import { FormControl } from '@angular/forms';
 
 export interface CarriageForm {
   readonly name: FormControl<string | null>;
-  readonly rows: FormControl<string | null>;
-  readonly leftSeats: FormControl<string | null>;
-  readonly rightSeats: FormControl<string | null>;
-  readonly backLeftSeats: FormControl<string | null>;
-  readonly backRightSeats: FormControl<string | null>;
+  readonly rows: FormControl<number | null>;
+  readonly leftSeats: FormControl<number | null>;
+  readonly rightSeats: FormControl<number | null>;
+  readonly backLeftSeats: FormControl<number[] | null>;
+  readonly backRightSeats: FormControl<number[] | null>;
 }

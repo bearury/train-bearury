@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { Carriage, Carriage2, CarriageVM } from '@interfaces/carriage.interface';
+import { Carriage, Carriage2, CarriageFormData, CarriageVM } from '@interfaces/carriage.interface';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,13 +16,13 @@ export class CarriageService {
     leftSeats: 2,
     rightSeats: 2,
   }]);
+  // public currentCarriage = signal<Carriage2 | null>(null);
+  public currentCarriage$ = new BehaviorSubject<Carriage2 | null>(null);
 
-
-  public currentCarriage = signal<Carriage2 | null>(null);
-
-  public updateCurrentCarriage = (carriage: Omit<Carriage2, 'matrixIndexSeats'>): void => {
-    this.currentCarriage.set(this.buildCurrentCarriage(carriage));
+  public updateCurrentCarriage = (carriage: CarriageFormData): void => {
+    this.currentCarriage$.next(this.buildCurrentCarriage(carriage));
   };
+
 
   public buildCarriageToVM = (carriage: Carriage): CarriageVM => {
     const { id, name, rows, leftSeats, rightSeats } = carriage;
@@ -47,15 +48,25 @@ export class CarriageService {
     };
   };
 
-  private buildCurrentCarriage({ id, name, leftSeats, rightSeats, backRightSeats, backLeftSeats }: Omit<Carriage2, 'matrixIndexSeats'>): Carriage2 {
+  private buildCurrentCarriage({ name, rows, leftSeats, rightSeats, backRightSeats, backLeftSeats }: CarriageFormData): Carriage2 {
+
     return {
-      id,
+      id: 'carriage-temp-id',
       name,
       leftSeats,
       rightSeats,
       backRightSeats,
       backLeftSeats,
-      matrixIndexSeats: [],
+      matrixIndexSeats: this.getMatrixIndexSeats(rows, leftSeats, rightSeats),
     };
+  }
+
+  private getMatrixIndexSeats(rows: number | null, leftSeats: number | null, rightSeats: number | null): number[][] {
+    const numberSeatsInRow = (leftSeats ?? 0) + (rightSeats ?? 0);
+    return Array.from({ length: numberSeatsInRow }).map((_, rowIndex) => {
+      return Array.from({ length: rows ?? 0 }).map((_, columnIndex) =>
+        (numberSeatsInRow - rowIndex) + numberSeatsInRow * columnIndex,
+      );
+    });
   }
 }
