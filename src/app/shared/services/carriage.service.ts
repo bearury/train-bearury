@@ -16,11 +16,14 @@ export class CarriageService {
     leftSeats: 2,
     rightSeats: 2,
   }]);
-  // public currentCarriage = signal<Carriage2 | null>(null);
+
+
+  public currentCarriageSignal = signal<Carriage2 | null>(null);
   public currentCarriage$ = new BehaviorSubject<Carriage2 | null>(null);
 
   public updateCurrentCarriage = (carriage: CarriageFormData): void => {
     this.currentCarriage$.next(this.buildCurrentCarriage(carriage));
+    this.currentCarriageSignal.set(this.buildCurrentCarriage(carriage));
   };
 
 

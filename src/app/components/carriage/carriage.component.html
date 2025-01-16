@@ -4,23 +4,23 @@
   <div class="seats-wrapper">
     <div class="line">
       <h2 tuiTitle="s">Ряды</h2>
-
-      {{ carriage().rightSeats ?? 0 - 1 }}
+      <div class="row-title">
+        <div>Правые ряды</div>
+        <div>Левые ряды</div>
+      </div>
     </div>
 
     <div class="block__seats">
-      @for (carriageRow of carriage().matrixIndexSeats; track carriageRow; let rowIndex = $index) {
-
-
+      @for (carriageRow of carriage().matrixIndexSeats; track rowIndex; let rowIndex = $index) {
         <div class="carriage-row"
-             [class.with-divider]="(carriage().rightSeats ?? 0 - 1) === rowIndex">
-          @for (item of carriageRow; track item; let i = $index) {
+             [class.with-divider]="dividerIndex() === rowIndex">
+          @for (item of carriageRow; track item; let elementIndex = $index) {
             <div class="row-index-wrapper">
               @if (rowIndex === 0) {
-                <div class="row-index">{{ i + 1 }}</div>
+                <div class="row-index">{{ elementIndex + 1 }}</div>
               }
             </div>
-            <app-carriage-cell [backSeat]="i % 2 === 0" [numberSeat]="item" />
+            <app-carriage-cell [backSeat]="getBackSeats(rowIndex, elementIndex)" [numberSeat]="item" />
           }
         </div>
       }

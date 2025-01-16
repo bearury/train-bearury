@@ -7,6 +7,7 @@
     <app-carriage [carriage]="carriage" />
   }
 
+
   <form [formGroup]="form" class="form">
     <tui-textfield>
       <label for="name" tuiLabel>Название</label>
@@ -29,18 +30,18 @@
     <div class="inputs-block-wrapper">
       <div class="input-block">
         <tui-textfield>
-          <label for="leftSeats" tuiLabel>Количество мест слева</label>
-          <input [formControl]="form.controls.leftSeats"
-                 id="leftSeats"
+          <label for="rightSeats" tuiLabel>Количество мест справа</label>
+          <input [formControl]="form.controls.rightSeats"
+                 id="rightSeats"
                  maxlength="1"
                  tuiInputNumber
           />
         </tui-textfield>
 
         <tui-textfield>
-          <label for="rightSeats" tuiLabel>Количество мест справа</label>
-          <input [formControl]="form.controls.rightSeats"
-                 id="rightSeats"
+          <label for="leftSeats" tuiLabel>Количество мест слева</label>
+          <input [formControl]="form.controls.leftSeats"
+                 id="leftSeats"
                  maxlength="1"
                  tuiInputNumber
           />
@@ -105,7 +106,7 @@
       </div>
     </div>
 
-    <button appearance="outline" class="submit-button" tuiButton type="submit">
+    <button (click)="onSubmit()" appearance="outline" class="submit-button" tuiButton type="submit">
       Создать
     </button>
   </form>

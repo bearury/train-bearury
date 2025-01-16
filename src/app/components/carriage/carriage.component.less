@@ -9,8 +9,26 @@
   box-shadow: var(--tui-shadow-small);
 }
 
+.row-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 0 1.2rem 0;
+  height: 100%;
+
+  div {
+    writing-mode: vertical-lr;
+    transform: rotate(-180deg);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
 .line {
   display: flex;
+  flex-direction: column;
   margin-top: -0.6rem;
 }
 
