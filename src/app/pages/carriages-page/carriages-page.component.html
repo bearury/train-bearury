@@ -23,7 +23,7 @@
                 <tui-icon icon="@tui.settings" />
               </button>
 
-              <button tuiButton size="s" appearance="outline" (click)="onDelete(carriage.id)">
+              <button tuiButton size="s" appearance="outline" (click)="showDialog({temp: template, id: carriage.id})">
                 <tui-icon icon="@tui.trash-2" />
               </button>
             </div>
@@ -36,3 +36,31 @@
     }
   }
 </div>
+
+<ng-template
+  #template
+  let-observer
+>
+  <p class="template-message">⚠️ Удаление вагона приведет к удалению всех связанных с ним поездов и маршрутов, восстановление будет невозможным ⚠️</p>
+
+  <div class="template-block-button">
+    <button
+      (click)="observer.complete()"
+      size="m"
+      tuiButton
+      type="button"
+    >
+      Отмена
+    </button>
+    <button
+      (click)="onDelete(observer)"
+      class="tui-space_right-3"
+      size="m"
+      tuiButton
+      type="button"
+    >
+      Удалить
+    </button>
+  </div>
+
+</ng-template>

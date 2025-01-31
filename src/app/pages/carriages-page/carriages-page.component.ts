@@ -1,12 +1,13 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CarriageFirestoreService } from '@services/firestore/carriage-firestore.service';
-import { TuiButton, TuiIcon, TuiLoader, TuiTitle } from '@taiga-ui/core';
-import { Observable } from 'rxjs';
+import { TuiButton, TuiDialogContext, TuiDialogService, TuiIcon, TuiLoader, TuiTitle } from '@taiga-ui/core';
+import { Observable, Observer } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { LoaderService } from '@services/loader.service';
 import { CarriageComponent } from '@components/carriage/carriage.component';
 import { Carriage } from '@interfaces/carriage.interface';
+import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
 
 @Component({
   selector: 'app-carriages-page',
@@ -24,11 +25,14 @@ import { Carriage } from '@interfaces/carriage.interface';
 })
 export class CarriagesPageComponent implements OnInit {
   public carriages$: Observable<Carriage[]> | undefined;
-  public loading$: Observable<boolean> | undefined;
+  public readonly loading$: Observable<boolean> | undefined;
+
+  private readonly idOnDelete = signal<string | null>(null);
 
   constructor(
     @Inject(CarriageFirestoreService) private readonly carriageFirestoreService: CarriageFirestoreService,
     @Inject(LoaderService) private readonly loaderService: LoaderService,
+    @Inject(TuiDialogService) private readonly dialog: TuiDialogService,
     @Inject(Router) private readonly router: Router,
   ) {
     this.loading$ = this.loaderService.loading$;
@@ -38,6 +42,7 @@ export class CarriagesPageComponent implements OnInit {
     this.carriages$ = this.carriageFirestoreService.getAll();
   }
 
+
   public handleClickButtons(): void {
     this.router.navigateByUrl('admin/carriage/create');
   }
@@ -46,7 +51,23 @@ export class CarriagesPageComponent implements OnInit {
     this.router.navigate(['admin/carriage/update', id]);
   }
 
-  public onDelete(id: string): void {
-    this.carriageFirestoreService.delete(id).subscribe();
+  public onDelete(observable: Observer<void>): void {
+    if (this.idOnDelete()) {
+      const id = this.idOnDelete() as string;
+      this.carriageFirestoreService.delete(id).subscribe(() => {
+        observable.complete();
+      });
+    }
+  }
+
+  protected showDialog({ temp, id }: { temp: PolymorpheusContent<TuiDialogContext>, id: string }): void {
+    this.dialog.open(temp, {
+      label: 'Внимание !!!',
+    }).subscribe({
+      complete: () => {
+        this.idOnDelete.set(null);
+      },
+    });
+    this.idOnDelete.set(id);
   }
 }
