@@ -11,10 +11,10 @@
     </div>
 
     <div class="block__seats">
-      @for (carriageRow of carriage().matrixIndexSeats; track rowIndex; let rowIndex = $index) {
+      @for (carriageRow of carriage().matrixIndexSeats; track trackByRowIndex(rowIndex); let rowIndex = $index) {
         <div class="carriage-row"
              [class.with-divider]="dividerIndex() === rowIndex">
-          @for (item of carriageRow; track item; let elementIndex = $index) {
+          @for (item of carriageRow; track trackByItem(item); let elementIndex = $index) {
             <div class="row-index-wrapper">
               @if (rowIndex === 0) {
                 <div class="row-index">{{ elementIndex + 1 }}</div>

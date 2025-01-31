@@ -1,0 +1,38 @@
+@let loading = loading$ | async;
+@let carriages = carriages$ | async;
+
+<div class="container">
+  <button (click)="handleClickButtons()" appearance="flat" class="button-create" size="s" tuiButton>
+    <tui-icon icon="@tui.plus" />
+    Создать вагон
+  </button>
+
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    @if (carriages) {
+      <div class="carriages-wrapper">
+        @for (carriage of carriages; track carriage.id) {
+          <div class="carriage-wrapper">
+            <app-carriage [carriage]="carriage" />
+
+            <div class="block-buttons">
+              <button tuiButton size="s" appearance="outline" (click)="onUpdate(carriage.id)">
+                <tui-icon icon="@tui.settings" />
+              </button>
+
+              <button tuiButton size="s" appearance="outline" (click)="onDelete(carriage.id)">
+                <tui-icon icon="@tui.trash-2" />
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    } @else {
+      <h2 tuiTitle="m">Станции пока не добавлены!</h2>
+    }
+  }
+</div>

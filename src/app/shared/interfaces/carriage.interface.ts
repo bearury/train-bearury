@@ -1,23 +1,4 @@
 export interface Carriage {
-  id?: string;
-  name: string;
-  rows: number;
-  leftSeats?: number;
-  rightSeats?: number;
-}
-
-export interface CarriageVM {
-  id?: string;
-  name: string;
-  rows: SeatVM[][];
-  dividerIndex: number;
-  columnsCount: number;
-  leftSeats?: number;
-  rightSeats?: number;
-  countSeats: number;
-}
-
-export interface Carriage2 {
   readonly id: string;
   readonly name: string | null;
   readonly matrixIndexSeats: number[][];
@@ -36,6 +17,21 @@ export interface CarriageFormData {
   readonly backRightSeats: number[];
 }
 
-export interface SeatVM {
-  index: number;
+export interface CarriageEntity {
+  readonly id: string;
+  readonly name: string;
+  readonly rows: number;
+  readonly leftSeats: number;
+  readonly rightSeats: number;
+  readonly backLeftSeats: number[];
+  readonly backRightSeats: number[];
+}
+
+export interface CarriageFormValue {
+  readonly name: string | null | undefined;
+  readonly rows: number | null | undefined;
+  readonly leftSeats: number | null | undefined;
+  readonly rightSeats: number | null | undefined;
+  readonly backLeftSeats: number[] | null | undefined;
+  readonly backRightSeats: number[] | null | undefined;
 }

@@ -1,60 +1,61 @@
-import { Injectable, signal } from '@angular/core';
-import { Carriage, Carriage2, CarriageFormData, CarriageVM } from '@interfaces/carriage.interface';
+import { Injectable } from '@angular/core';
+import { Carriage, CarriageEntity, CarriageFormData } from '@interfaces/carriage.interface';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CarriageService {
-  public carriagesFromResponseSignal = signal<CarriageVM[]>([{
-    id: '',
-    rows: [[{ index: 1 }], [{ index: 2 }], [{ index: 3 }], [{ index: 4 }], [{ index: 5 }]],
-    name: 'Фейковые данные!',
-    columnsCount: 2,
-    dividerIndex: 2,
-    countSeats: 4,
-    leftSeats: 2,
-    rightSeats: 2,
-  }]);
+  // public currentCarriageSignal = signal<Carriage | null>(null);
+  public currentCarriage$ = new BehaviorSubject<Carriage | null>(null);
 
+  private _updateMode$ = new BehaviorSubject<boolean>(false);
+  public isUpdateMode$ = this._updateMode$.asObservable();
 
-  public currentCarriageSignal = signal<Carriage2 | null>(null);
-  public currentCarriage$ = new BehaviorSubject<Carriage2 | null>(null);
+  public setUpdateMode(): void {
+    this._updateMode$.next(true);
+  }
+
+  public setCreateMode(): void {
+    this._updateMode$.next(false);
+  }
 
   public updateCurrentCarriage = (carriage: CarriageFormData): void => {
     this.currentCarriage$.next(this.buildCurrentCarriage(carriage));
-    this.currentCarriageSignal.set(this.buildCurrentCarriage(carriage));
   };
 
+  public resetCurrentCarriage(): void {
+    this.currentCarriage$.next(null);
+  }
 
-  public buildCarriageToVM = (carriage: Carriage): CarriageVM => {
-    const { id, name, rows, leftSeats, rightSeats } = carriage;
-    const rowsCount = (leftSeats ?? 0) + (rightSeats ?? 0);
-    const columnsCount = rows;
-    const dividerIndex = (rightSeats ?? 0) - 1;
+  public buildCarriagesEntity = (carriages: CarriageEntity[]): Carriage[] => {
+    return carriages.map(entity => this.buildCarriage({
+      id: entity.id,
+      name: entity.name,
+      rows: entity.rows,
+      leftSeats: entity.leftSeats,
+      rightSeats: entity.rightSeats,
+      backLeftSeats: entity.backLeftSeats,
+      backRightSeats: entity.backRightSeats,
+    }));
+  };
 
+  private buildCarriage({ id, name, rows, leftSeats, rightSeats, backRightSeats, backLeftSeats }: CarriageEntity): Carriage {
     return {
-      rows: Array.from({ length: rowsCount }).map((row, rowIndex) => {
-        return Array.from({ length: columnsCount }).map((item, columnIndex) => {
-          return {
-            index: (rowsCount - rowIndex) + rowsCount * columnIndex,
-          };
-        });
-      }),
-      dividerIndex,
       id,
       name,
-      columnsCount,
-      countSeats: rowsCount * columnsCount,
       leftSeats,
       rightSeats,
+      backRightSeats,
+      backLeftSeats,
+      matrixIndexSeats: this.getMatrixIndexSeats(rows, leftSeats, rightSeats),
     };
-  };
+  }
 
-  private buildCurrentCarriage({ name, rows, leftSeats, rightSeats, backRightSeats, backLeftSeats }: CarriageFormData): Carriage2 {
 
+  private buildCurrentCarriage({ name, rows, leftSeats, rightSeats, backRightSeats, backLeftSeats }: CarriageFormData): Carriage {
     return {
-      id: 'carriage-temp-id',
+      id: 'currentCarriage-mockId',
       name,
       leftSeats,
       rightSeats,

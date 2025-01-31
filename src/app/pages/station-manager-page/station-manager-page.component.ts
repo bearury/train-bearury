@@ -21,6 +21,7 @@ import { LoaderInPageService } from '@services/loader-in-page.service';
 import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
 import { tap } from 'rxjs';
 import { STATION_TEMP_ID } from '../../shared/tokens/station-temp-id.token';
+import { setErrorFormFieldError } from '../../shared/helpers/set-error-form-field';
 
 
 @Component({
@@ -148,14 +149,8 @@ export class StationManagerPageComponent implements OnInit {
           .subscribe();
       }
     } else {
-      Object.keys(this.form.controls).forEach(key => {
-        if (this.form.get(key)?.valid) {
-          this.form.get(key)?.markAsUntouched();
-        } else {
-          this.form.get(key)?.markAsTouched();
-        }
-      });
-
+      setErrorFormFieldError(this.form);
+      
       this.form.controls.connectedTo.controls.map(control => {
         control.markAsUntouched();
         if (control.valid) {
