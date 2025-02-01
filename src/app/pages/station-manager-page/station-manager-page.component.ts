@@ -195,7 +195,7 @@ export class StationManagerPageComponent implements OnInit {
   private setMainBalloonFromEditField(): void {
     const { city, latitude, longitude } = this.form.value;
     const tempStation: Station = {
-      id: this.stationTempId, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
+      id: this.mapService.TEMP_STATION_ID, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
     };
 
     this.mapService.setMainBalloon(tempStation);
