@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Inject, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TuiAlertService, TuiButton, TuiDialogContext, TuiDialogService, TuiError, TuiIcon, TuiLabel, TuiLoader, TuiScrollable, TuiTextfieldComponent, TuiTextfieldDirective, TuiTitle } from '@taiga-ui/core';
@@ -20,6 +20,8 @@ import { uniqueValuesValidator } from '../../shared/helpers/unique-values.valida
 import { LoaderInPageService } from '@services/loader-in-page.service';
 import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
 import { tap } from 'rxjs';
+import { STATION_TEMP_ID } from '../../shared/tokens/station-temp-id.token';
+import { setErrorFormFieldError } from '../../shared/helpers/set-error-form-field';
 
 
 @Component({
@@ -86,6 +88,11 @@ export class StationManagerPageComponent implements OnInit {
   public loadingInPage$ = this.loaderInPageService.loading$;
   private readonly destroyRef = inject(DestroyRef);
 
+  constructor(
+    @Inject(STATION_TEMP_ID) private stationTempId: string,
+  ) {
+  }
+
   public ngOnInit(): void {
     const param = this.activatedRoute.snapshot.paramMap.get('stationId');
     this.stationId.set(param);
@@ -142,14 +149,8 @@ export class StationManagerPageComponent implements OnInit {
           .subscribe();
       }
     } else {
-      Object.keys(this.form.controls).forEach(key => {
-        if (this.form.get(key)?.valid) {
-          this.form.get(key)?.markAsUntouched();
-        } else {
-          this.form.get(key)?.markAsTouched();
-        }
-      });
-
+      setErrorFormFieldError(this.form);
+      
       this.form.controls.connectedTo.controls.map(control => {
         control.markAsUntouched();
         if (control.valid) {
@@ -202,7 +203,7 @@ export class StationManagerPageComponent implements OnInit {
 
   private setStateCurrentValue(city: string, latitude: number, longitude: number): void {
     const tempStation: Station = {
-      id: this.mapService.TEMP_STATION_ID, city, latitude, longitude, connectedTo: [],
+      id: this.stationTempId, city, latitude, longitude, connectedTo: [],
     };
 
     this.mapService.setMainBalloon(tempStation);

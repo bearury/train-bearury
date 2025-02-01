@@ -1,0 +1,66 @@
+@let loading = loading$ | async;
+@let carriages = carriages$ | async;
+
+<div class="container">
+  <button (click)="handleClickButtons()" appearance="flat" class="button-create" size="s" tuiButton>
+    <tui-icon icon="@tui.plus" />
+    Создать вагон
+  </button>
+
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    @if (carriages) {
+      <div class="carriages-wrapper">
+        @for (carriage of carriages; track carriage.id) {
+          <div class="carriage-wrapper">
+            <app-carriage [carriage]="carriage" />
+
+            <div class="block-buttons">
+              <button tuiButton size="s" appearance="outline" (click)="onUpdate(carriage.id)">
+                <tui-icon icon="@tui.settings" />
+              </button>
+
+              <button tuiButton size="s" appearance="outline" (click)="showDialog({temp: template, id: carriage.id})">
+                <tui-icon icon="@tui.trash-2" />
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    } @else {
+      <h2 tuiTitle="m">Станции пока не добавлены!</h2>
+    }
+  }
+</div>
+
+<ng-template
+  #template
+  let-observer
+>
+  <p class="template-message">⚠️ Удаление вагона приведет к удалению всех связанных с ним поездов и маршрутов, восстановление будет невозможным ⚠️</p>
+
+  <div class="template-block-button">
+    <button
+      (click)="observer.complete()"
+      size="m"
+      tuiButton
+      type="button"
+    >
+      Отмена
+    </button>
+    <button
+      (click)="onDelete(observer)"
+      class="tui-space_right-3"
+      size="m"
+      tuiButton
+      type="button"
+    >
+      Удалить
+    </button>
+  </div>
+
+</ng-template>

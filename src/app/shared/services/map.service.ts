@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Station } from '@interfaces/station.interface';
+import { STATION_TEMP_ID } from '../tokens/station-temp-id.token';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class MapService {
-  public TEMP_STATION_ID = 'temp_id';
   private _balloons$ = new BehaviorSubject<Station[]>([]);
   public balloons$ = this._balloons$.asObservable();
   private _editMode$ = new BehaviorSubject<boolean>(false);
   public isEditMode$ = this._editMode$.asObservable();
 
+  constructor(@Inject(STATION_TEMP_ID) private stationTempId: string) {
+  }
 
   private get balloons(): Station[] {
     return this._balloons$.getValue();
@@ -39,7 +41,7 @@ export class MapService {
   }
 
   public setMainBalloon(balloon: Station): void {
-    const connectedToStations = this.balloons.filter((balloon) => balloon.id !== this.TEMP_STATION_ID);
+    const connectedToStations = this.balloons.filter((balloon) => balloon.id !== this.stationTempId);
     this._balloons$.next([...connectedToStations, balloon]);
   }
 
@@ -53,7 +55,7 @@ export class MapService {
   }
 
   private removeAllConnectedToBalloon(): void {
-    this._balloons$.next(this.balloons.filter((balloon) => balloon.id === this.TEMP_STATION_ID));
+    this._balloons$.next(this.balloons.filter((balloon) => balloon.id === this.stationTempId));
   }
 
 

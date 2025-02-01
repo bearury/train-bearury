@@ -2,7 +2,7 @@
   @for (balloon of balloons$ | async; track $index) {
     <ya-placemark
       [geometry]="[balloon.latitude, balloon.longitude]"
-      [options]="{iconColor: balloon.id === mapService.TEMP_STATION_ID ? 'green' : 'red'}"
+      [options]="{iconColor: balloon.id === stationTempId ? 'green' : 'red'}"
       [properties]="{
             hintContent: balloon.city
           }"></ya-placemark>

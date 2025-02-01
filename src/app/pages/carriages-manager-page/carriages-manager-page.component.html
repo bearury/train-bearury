@@ -1,0 +1,161 @@
+@let carriage = currentCarriage$ | async;
+@let loading = loading$ | async;
+@let loadingInPage = loadingInPage$ | async;
+@let isRequiredControlRows = form.controls.name.invalid && form.controls.name.touched;
+@let isRequiredControlLeftSeats = form.controls.leftSeats.invalid && form.controls.leftSeats.touched;
+@let isRequiredControlRigthSeats = form.controls.rightSeats.invalid && form.controls.rightSeats.touched;
+
+
+<div class="create-carriages__container">
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+
+    @if (carriage) {
+      <app-carriage [carriage]="carriage" />
+    }
+
+    <form [formGroup]="form" class="form">
+      <tui-textfield>
+        <label for="name" tuiLabel>Название</label>
+        <input [formControl]="form.controls.name"
+               id="name"
+               tuiTextfield
+               type="text"
+        />
+      </tui-textfield>
+
+      <div>
+        <tui-textfield>
+          <label for="rows" tuiLabel>Количество рядов</label>
+          <input [formControl]="form.controls.rows"
+                 [required]="isRequiredControlRows"
+                 id="rows"
+                 maxlength="2"
+                 tuiInputNumber
+          />
+        </tui-textfield>
+        <tui-error
+          [error]="[] | tuiFieldError | async"
+          [formControl]="form.controls.rows"
+          class="error-message"
+        />
+      </div>
+
+      <div class="inputs-block-wrapper">
+        <div class="input-block">
+          <div>
+            <tui-textfield>
+              <label for="leftSeats" tuiLabel>Количество мест слева</label>
+              <input [formControl]="form.controls.leftSeats"
+                     [required]="isRequiredControlLeftSeats"
+                     id="leftSeats"
+                     maxlength="1"
+                     tuiInputNumber
+              />
+            </tui-textfield>
+            <tui-error
+              [error]="[] | tuiFieldError | async"
+              [formControl]="form.controls.leftSeats"
+              class="error-message"
+            />
+          </div>
+
+          <tui-multi-select
+            [editable]="false"
+            [formControl]="form.controls.backLeftSeats"
+            [tuiDropdownMaxHeight]="300"
+            [tuiTextfieldCleaner]="true"
+          >
+            Ряды слева с обратным расположением кресел
+            <tui-data-list
+              *tuiDataList
+              emptyContent="Укажите валидное количество рядов"
+              tuiDataListDropdownManager
+              tuiMultiSelectGroup
+            >
+              @if (form.controls.rows.valid) {
+                @for (_ of [].constructor(form.controls.rows.value); track index; let index = $index) {
+                  <button
+                    [value]="index  + 1"
+                    tuiOption
+                    type="button"
+                  >
+                    {{ index + 1 }}
+                  </button>
+                }
+              }
+            </tui-data-list>
+          </tui-multi-select>
+        </div>
+
+        <div class="input-block">
+          <div>
+            <tui-textfield>
+              <label for="rightSeats" tuiLabel>Количество мест справа</label>
+              <input [formControl]="form.controls.rightSeats"
+                     [required]="isRequiredControlRigthSeats"
+                     id="rightSeats"
+                     maxlength="1"
+                     tuiInputNumber
+              />
+            </tui-textfield>
+            <tui-error
+              [error]="[] | tuiFieldError | async"
+              [formControl]="form.controls.rightSeats"
+              class="error-message"
+            />
+          </div>
+          <tui-multi-select
+            [editable]="false"
+            [formControl]="form.controls.backRightSeats"
+            [tuiDropdownMaxHeight]="300"
+            [tuiTextfieldCleaner]="true"
+          >
+            Ряды справа с обратным расположением кресел
+            <tui-data-list
+              *tuiDataList
+              emptyContent="Укажите валидное количество рядов"
+              tuiDataListDropdownManager
+              tuiMultiSelectGroup
+            >
+              @if (form.controls.rows.valid) {
+                @for (t of [].constructor(form.controls.rows.value); track index; let index = $index) {
+                  <button
+                    [value]="index + 1"
+                    tuiOption
+                    type="button"
+                  >
+                    {{ index + 1 }}
+                  </button>
+                }
+              }
+            </tui-data-list>
+          </tui-multi-select>
+
+
+        </div>
+      </div>
+
+      <tui-loader
+        [inheritColor]="true"
+        [overlay]="true"
+        [showLoader]="!!loadingInPage"
+        class="loader-page"
+      >
+
+        <button (click)="onSubmit()" appearance="outline" class="submit-button" tuiButton type="submit">
+          {{ (isUpdateMode$ | async) ? 'Обновить' : 'Создать' }}
+        </button>
+      </tui-loader>
+    </form>
+  }
+</div>
+
+
+
+
+
+

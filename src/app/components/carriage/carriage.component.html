@@ -1,0 +1,29 @@
+<div class="carriage-wrapper">
+  <h4>{{ carriage().name }}</h4>
+
+  <div class="seats-wrapper">
+    <div class="line">
+      <h2 tuiTitle="s">Ряды</h2>
+      <div class="row-title">
+        <div>Правые ряды</div>
+        <div>Левые ряды</div>
+      </div>
+    </div>
+
+    <div class="block__seats">
+      @for (carriageRow of carriage().matrixIndexSeats; track trackByRowIndex(rowIndex); let rowIndex = $index) {
+        <div class="carriage-row"
+             [class.with-divider]="dividerIndex() === rowIndex">
+          @for (item of carriageRow; track trackByItem(item); let elementIndex = $index) {
+            <div class="row-index-wrapper">
+              @if (rowIndex === 0) {
+                <div class="row-index">{{ elementIndex + 1 }}</div>
+              }
+            </div>
+            <app-carriage-cell [backSeat]="getBackSeats(rowIndex, elementIndex)" [numberSeat]="item" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
