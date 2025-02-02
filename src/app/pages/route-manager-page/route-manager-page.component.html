@@ -8,6 +8,39 @@
 
     <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form" tuiForm="m">
 
+      <div class="row">
+        @for (station of form.controls.stations.controls; track station; let index = $index) {
+          <div class="select-field">
+            <tui-select
+              [formControl]="station"
+              [stringify]="stringify"
+            >
+              Станция #{{ index + 1 }}
+              <select
+                placeholder="Select character"
+                tuiSelect
+                [items]="getConnectedStationsSelect(index)"
+              >
+              </select>
+            </tui-select>
+
+            @if (form.controls.stations.controls.length > 1) {
+              <button (click)="handleRemoveControl('stations', station)" appearance="secondary" size="s" tuiButton type="button">
+                <tui-icon icon="@tui.trash-2" />
+              </button>
+            }
+          </div>
+
+
+        }
+
+        <div class="block-button-control">
+          <button (click)="handleAddControl('stations')" appearance="secondary" size="s" tuiButton type="button">
+            <tui-icon icon="@tui.plus" />
+          </button>
+        </div>
+      </div>
+
 
       <tui-loader
         [inheritColor]="true"
@@ -31,3 +64,13 @@
     </form>
   </div>
 </div>
+
+
+<ng-template
+  #content
+  let-data
+>
+  <div class="template">
+    <div class="name">{{ data.city }}</div>
+  </div>
+</ng-template>
