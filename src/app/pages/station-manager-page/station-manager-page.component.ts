@@ -101,6 +101,14 @@ export class StationManagerPageComponent implements OnInit {
       this.mapService.setViewMode();
     } else {
       this.mapService.setEditMode();
+
+      this.form.valueChanges.subscribe(() => {
+        if (this.form.controls.latitude.valid && this.form.controls.longitude.valid) {
+          this.setMainBalloonFromEditField();
+        } else {
+          this.mapService.removeMainBalloon();
+        }
+      });
     }
 
     this.stationsFirestoreService.getAll().subscribe(stations => this.setInitData(stations, this.stationId()));
@@ -110,13 +118,6 @@ export class StationManagerPageComponent implements OnInit {
       this.mapService.addBalloons(filteredArrayIsNullValueControls);
     });
 
-    this.form.valueChanges.subscribe(() => {
-      if (this.form.controls.latitude.valid && this.form.controls.longitude.valid) {
-        this.setMainBalloonFromEditField();
-      } else {
-        this.mapService.removeMainBalloon();
-      }
-    });
   }
 
   public onClickMap(event: EmittedValueMap): void {
@@ -150,7 +151,7 @@ export class StationManagerPageComponent implements OnInit {
       }
     } else {
       setErrorFormFieldError(this.form);
-      
+
       this.form.controls.connectedTo.controls.map(control => {
         control.markAsUntouched();
         if (control.valid) {
@@ -195,7 +196,7 @@ export class StationManagerPageComponent implements OnInit {
   private setMainBalloonFromEditField(): void {
     const { city, latitude, longitude } = this.form.value;
     const tempStation: Station = {
-      id: this.mapService.TEMP_STATION_ID, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
+      id: this.stationTempId, city: city ?? '', latitude: +latitude!, longitude: +longitude!, connectedTo: [],
     };
 
     this.mapService.setMainBalloon(tempStation);
@@ -229,6 +230,8 @@ export class StationManagerPageComponent implements OnInit {
 
     if (currentStation) {
       this.setStateCurrentValue(currentStation.city, +currentStation.latitude, +currentStation.longitude);
+
+      // this.mapService.setMainBalloon(currentStation);
 
       this.form.controls.city.disable();
       this.form.controls.latitude.disable();

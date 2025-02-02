@@ -5,19 +5,16 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { env } from '../env/firebase';
+
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { AngularYandexMapsModule, YaConfig } from 'angular8-yandex-maps';
+import { AngularYandexMapsModule } from 'angular8-yandex-maps';
+import { env, yaConfig } from '@env';
 
-
-const config: YaConfig = {
-  apikey: '5c6cbf77-5d8b-4182-aab6-95b91ea89bdc',
-};
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(AngularYandexMapsModule.forRoot(config)),
+    importProvidersFrom(AngularYandexMapsModule.forRoot(yaConfig)),
     provideAnimations(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),

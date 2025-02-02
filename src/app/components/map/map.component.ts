@@ -28,7 +28,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    // Костыль для перерерисовки карты при повторной отрисовке
+    // Костыль для перерисовки карты при повторной инициализации
     this.hostElement.nativeElement.style.minHeight = '30vh';
     this.hostElement.nativeElement.style.flex = '1 1 20%';
   }

@@ -1,4 +1,4 @@
-import { IEnv } from '../app/shared/interfaces/env.interface';
+import { IEnv } from '@interfaces/env.interface';
 
 export const env: IEnv = {
   apiKey: 'AIzaSyCZMPxbrVWz83QQtPKCVp4_61cyQz9Tubw',

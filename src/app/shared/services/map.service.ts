@@ -46,7 +46,7 @@ export class MapService {
   }
 
   public removeMainBalloon(): void {
-    const connectedToStations = this.balloons.filter((balloon) => balloon.id !== this.TEMP_STATION_ID);
+    const connectedToStations = this.balloons.filter((balloon) => balloon.id !== this.stationTempId);
     this._balloons$.next([...connectedToStations]);
   }
 
