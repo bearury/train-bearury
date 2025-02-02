@@ -4,6 +4,8 @@ import { StationsPageComponent } from '@pages/stations-page/stations-page.compon
 import { StationManagerPageComponent } from '@pages/station-manager-page/station-manager-page.component';
 import { CarriagesManagerPageComponent } from '@pages/carriages-manager-page/carriages-manager-page.component';
 import { CarriagesPageComponent } from '@pages/carriages-page/carriages-page.component';
+import { RoutesPageComponent } from '@pages/routes-page/routes-page.component';
+import { RouteManagerPageComponent } from '@pages/route-manager-page/route-manager-page.component';
 
 export const routes: Routes = [
   {
@@ -51,10 +53,23 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'routes',
+        component: RoutesPageComponent,
+      },
+      {
+        path: 'route',
+        children: [
+          {
+            path: 'create',
+            component: RouteManagerPageComponent,
+          },
+        ],
+      },
     ],
   },
   {
     path: '**',
-    redirectTo: 'admin/stations',
+    redirectTo: 'admin/routes',
   },
 ];

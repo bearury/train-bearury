@@ -1,0 +1,33 @@
+<div class="container">
+  <h1 class="title" tuiTitle="m">
+    <tui-icon icon="@tui.route" />
+    Менеджер маршрута
+  </h1>
+
+  <div class="content">
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form" tuiForm="m">
+
+
+      <tui-loader
+        [inheritColor]="true"
+        [overlay]="false"
+        [showLoader]="false"
+      >
+        <div class="wrapper-loader-button">
+          <button
+            appearance="positive"
+            class="submit-button"
+            tuiButton
+            type="submit"
+          >
+            Сохранить
+          </button>
+
+        </div>
+
+      </tui-loader>
+
+    </form>
+  </div>
+</div>
