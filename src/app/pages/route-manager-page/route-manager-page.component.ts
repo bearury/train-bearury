@@ -1,29 +1,29 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal } from '@angular/core';
-import { TuiButton, TuiIcon, TuiLoader, TuiTitle } from '@taiga-ui/core';
+import { TuiButton, TuiIcon, TuiLoader } from '@taiga-ui/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiForm } from '@taiga-ui/layout';
 import { RouteManagerForm } from '@interfaces/route-manager-form.interface';
 import { StationEntity } from '@entitys/station.entity';
 import { Carriage, CarriageEntity } from '@interfaces/carriage.interface';
-import { StationsFirestoreService } from '@services/firestore/stations.service';
-import { CarriageFirestoreService } from '@services/firestore/carriage-firestore.service';
 import { Observable, Subscription } from 'rxjs';
 import { TuiMultiSelectModule, TuiSelectModule } from '@taiga-ui/legacy';
 import { TuiStringHandler } from '@taiga-ui/cdk';
 import { Station } from '@interfaces/station.interface';
+import { RouteFirestoreService } from '@services/firestore/route-firestore.service';
+import { LoaderService } from '@services/loader.service';
+import { AsyncPipe } from '@angular/common';
+import { LoaderInPageService } from '@services/loader-in-page.service';
 
 @Component({
   selector: 'app-route-manager-page',
   imports: [
     TuiIcon,
-    TuiTitle,
     FormsModule,
-    TuiForm,
     ReactiveFormsModule,
     TuiButton,
     TuiLoader,
     TuiMultiSelectModule,
     TuiSelectModule,
+    AsyncPipe,
   ],
   templateUrl: './route-manager-page.component.html',
   styleUrl: './route-manager-page.component.less',
@@ -33,20 +33,28 @@ import { Station } from '@interfaces/station.interface';
 export class RouteManagerPageComponent implements OnInit {
   public form = new FormGroup<RouteManagerForm>({
     stations: new FormArray<FormControl<Station | null>>([]),
-    carriages: new FormArray<FormControl<CarriageEntity | null>>([]),
+    carriages: new FormArray<FormControl<Carriage | null>>([]),
   });
 
   public readonly stations = signal<Station[]>([]);
-  public readonly carriages$: Observable<Carriage[]>;
-
+  public readonly carriages = signal<Carriage[]>([]);
+  public loading$: Observable<boolean>;
+  public loadingInPage$: Observable<boolean>;
   private subs: Subscription[] = [];
 
   constructor(
-    @Inject(StationsFirestoreService) private readonly stationsFirestoreService: StationsFirestoreService,
-    @Inject(CarriageFirestoreService) private readonly carriageFirestoreService: CarriageFirestoreService,
+    @Inject(RouteFirestoreService) private readonly routesFirestoreService: RouteFirestoreService,
+    @Inject(LoaderService) private readonly loaderService: LoaderService,
+    @Inject(LoaderInPageService) private readonly loaderInPageService: LoaderInPageService,
   ) {
-    this.stationsFirestoreService.getAll().subscribe(stations => this.stations.set(stations));
-    this.carriages$ = this.carriageFirestoreService.getAll();
+
+    this.routesFirestoreService.getStationAndCarriages().subscribe((arr) => {
+      this.stations.set(arr[0]);
+      this.carriages.set(arr[1]);
+    });
+
+    this.loading$ = this.loaderService.loading$;
+    this.loadingInPage$ = this.loaderInPageService.loading$;
   }
 
   public ngOnInit(): void {
@@ -59,7 +67,17 @@ export class RouteManagerPageComponent implements OnInit {
   }
 
   public onSubmit(): void {
-    console.log('🦜: ', this.form.value);
+    if (this.form.valid) {
+      this.routesFirestoreService.addRoute(this.form.controls.stations.value, this.form.controls.carriages.value).subscribe();
+    } else {
+      this.form.controls.stations.controls.forEach((c) => {
+        c.markAsTouched();
+      });
+
+      this.form.controls.carriages.controls.forEach((c) => {
+        c.markAsTouched();
+      });
+    }
   }
 
   public getConnectedStationsSelect(index: number): Station[] {
@@ -117,7 +135,8 @@ export class RouteManagerPageComponent implements OnInit {
     }
   }
 
-  protected stringify: TuiStringHandler<StationEntity> = (item) => item.city;
+  protected stringifyStation: TuiStringHandler<StationEntity> = (item) => item.city;
+  protected stringifyCarriage: TuiStringHandler<CarriageEntity> = (item) => item.name;
 
   private subscribeToStationControlChanges(index: number): void {
     const stationControl = this.form.controls.stations.controls[index];

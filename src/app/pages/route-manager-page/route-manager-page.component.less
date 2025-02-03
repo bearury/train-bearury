@@ -1,3 +1,5 @@
+@import '@taiga-ui/core/styles/taiga-ui-local.less';
+
 .container {
   margin-top: 1rem;
 
@@ -13,20 +15,47 @@
 .content {
   margin-top: 1rem;
 
-  .row {
+  .group-fields {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: start;
+    justify-content: space-between;
     gap: 1rem;
+    margin-bottom: 1rem;
 
-    .select-field {
-      display: flex;
-      align-items: center;
-      justify-content: start;
-      gap: .5rem;
+    @media @tui-mobile {
+      flex-direction: column;
     }
 
-    .select-field tui-select {
-      flex: 1 1 auto;
+
+    .block-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+      width: 100%;
+
+      h2 {
+        color: var(--tui-text-positive);
+        text-align: center;
+      }
+
+      .select-field {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: .5rem;
+      }
+
+      .select-field tui-select {
+        flex: 1 1 auto;
+      }
     }
   }
+}
+
+.loader-page {
+  display: flex;
+  inline-size: fit-content;
+  margin: 1rem 0;
 }
