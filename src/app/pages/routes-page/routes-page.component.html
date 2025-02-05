@@ -1,6 +1,19 @@
+@let routes = routes$ | async;
+
 <div class="container">
   <button (click)="handleClickButtons()" appearance="flat" class="button-create" size="s" tuiButton>
     <tui-icon icon="@tui.plus" />
     Создать маршрут
   </button>
+
+  <div class="content">
+
+
+    @if (routes) {
+      @for (route of routes; track route.id) {
+        <app-card-route [route]="route" />
+      }
+    }
+
+  </div>
 </div>

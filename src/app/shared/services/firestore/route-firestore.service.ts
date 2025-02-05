@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import { addDoc, collection, Firestore, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, collectionData, Firestore, query, updateDoc } from '@angular/fire/firestore';
 import { LoaderService } from '@services/loader.service';
 import { LoaderInPageService } from '@services/loader-in-page.service';
 import { catchError, combineLatest, from, map, Observable, of, switchMap, tap } from 'rxjs';
@@ -8,6 +8,9 @@ import { Station } from '@interfaces/station.interface';
 import { StationsFirestoreService } from '@services/firestore/stations.service';
 import { CarriageFirestoreService } from '@services/firestore/carriage-firestore.service';
 import { TuiAlertService } from '@taiga-ui/core';
+import { removeNullFromArray } from '../../helpers/remove-null-from-array';
+import { RouteEntity } from '@entitys/route.entity';
+import { Route } from '@interfaces/route.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -37,8 +40,8 @@ export class RouteFirestoreService {
     const ref = collection(this.db, 'routes');
 
     return from(addDoc(ref, {
-      carriages: this.removeNullFromArray<Carriage>(carriages).map(carriage => carriage.id),
-      stations: this.removeNullFromArray<Station>(stations).map(station => station.id),
+      carriages: removeNullFromArray<Carriage>(carriages).map(carriage => carriage.id),
+      stations: removeNullFromArray<Station>(stations).map(station => station.id),
     })).pipe(
       switchMap((docRef) => {
         return from(updateDoc(docRef, { id: docRef.id })).pipe(
@@ -58,7 +61,40 @@ export class RouteFirestoreService {
       }));
   }
 
-  private removeNullFromArray<T>(arr: (T | null)[]): T[] {
-    return arr.filter(item => item !== null);
-  };
+  public getAll(): Observable<Route[]> {
+    this.loaderService.show();
+    const data$ = this.getAllEntity();
+    const stationsAndCarriages$ = this.getStationAndCarriages();
+
+    return combineLatest(stationsAndCarriages$, data$).pipe(
+      map((arr) => {
+        const stations: Station[] = arr[0][0];
+        const carriages: Carriage[] = arr[0][1];
+        const routes: RouteEntity[] = arr[1];
+
+        return routes.map(route => {
+          const newStations = route.stations.map(stationId => stations.find(s => s.id === stationId)) as Station[];
+          const newCarriages = route.carriages.map(carriageId => carriages.find(s => s.id === carriageId)) as Carriage[];
+
+          return {
+            id: route.id,
+            name: `${newStations[0]?.city} - ${newStations[newStations.length - 1]?.city}`,
+            stations: newStations,
+            carriages: newCarriages,
+          };
+
+        });
+
+      }),
+      tap((t) => console.log('[71] 🍄: ', t)),
+      tap(() => this.loaderService.hide()),
+    );
+  }
+
+  private getAllEntity(): Observable<RouteEntity[]> {
+    const queryId = query(
+      collection(this.db, 'routes'),
+    );
+    return collectionData(queryId, { idField: 'id' }) as Observable<RouteEntity[]>;
+  }
 }

@@ -1,0 +1,41 @@
+<div class="wrapper" tuiAppearance="floating" tuiCardLarge>
+  <div class="header">
+    <div tuiTitle="m">"{{ route().name }}"</div>
+
+    <div class="settings">
+      <button appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.settings" />
+      </button>
+
+      <button appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.trash-2" />
+      </button>
+    </div>
+  </div>
+
+  <div class="route">
+    @if (route().stations.length) {
+      @for (station of route().stations; track station.id; let index = $index) {
+        <span>
+          @if (index !== 0) {
+            <span>-</span>
+          }
+          {{ station.city }}
+        </span>
+      }
+    }
+  </div>
+
+  <div class="route">
+    @if (route().carriages.length) {
+      @for (carriage of route().carriages; track carriage.id; let index = $index) {
+        <span>
+          @if (index !== 0) {
+            <span>-</span>
+          }
+          {{ carriage.name }}
+        </span>
+      }
+    }
+  </div>
+</div>
