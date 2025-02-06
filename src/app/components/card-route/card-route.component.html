@@ -3,39 +3,47 @@
     <div tuiTitle="m">"{{ route().name }}"</div>
 
     <div class="settings">
-      <button appearance="outline" size="s" tuiButton>
+      <button (click)="onUpdate(route().id)" appearance="outline" size="s" tuiButton>
         <tui-icon icon="@tui.settings" />
       </button>
 
-      <button appearance="outline" size="s" tuiButton>
+      <button (click)="onDelete(route().id)" appearance="outline" size="s" tuiButton>
         <tui-icon icon="@tui.trash-2" />
       </button>
     </div>
   </div>
 
   <div class="route">
-    @if (route().stations.length) {
-      @for (station of route().stations; track station.id; let index = $index) {
-        <span>
+    <h4>Маршрут движения:</h4>
+    <div class="content">
+      @if (route().stations.length) {
+        @for (station of route().stations; track station.id + index; let index = $index) {
+          <span>
           @if (index !== 0) {
             <span>-</span>
           }
-          {{ station.city }}
+            {{ station.city }}
         </span>
+        }
       }
-    }
+    </div>
   </div>
 
-  <div class="route">
-    @if (route().carriages.length) {
-      @for (carriage of route().carriages; track carriage.id; let index = $index) {
-        <span>
+  <div class="carriages">
+    <h4>Состав вагонов:</h4>
+    <div class="content">
+      @if (route().carriages.length) {
+        @for (carriage of route().carriages; track carriage.id + index; let index = $index) {
+          <span>
           @if (index !== 0) {
             <span>-</span>
           }
-          {{ carriage.name }}
+            №{{ index + 1 }} {{ carriage.name }}
         </span>
+        }
+      } @else {
+        <span>Ни один вагон не включен в состав</span>
       }
-    }
+    </div>
   </div>
 </div>

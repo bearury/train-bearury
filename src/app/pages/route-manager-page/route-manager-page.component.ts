@@ -12,6 +12,8 @@ import { RouteFirestoreService } from '@services/firestore/route-firestore.servi
 import { LoaderService } from '@services/loader.service';
 import { AsyncPipe } from '@angular/common';
 import { LoaderInPageService } from '@services/loader-in-page.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Route } from '@interfaces/route.interface';
 
 @Component({
   selector: 'app-route-manager-page',
@@ -40,11 +42,14 @@ export class RouteManagerPageComponent implements OnInit {
   public readonly carriages = signal<Carriage[]>([]);
   public loading$: Observable<boolean>;
   public loadingInPage$: Observable<boolean>;
+  public readonly routeId = signal<string>('');
   private subs: Subscription[] = [];
 
   constructor(
     @Inject(RouteFirestoreService) private readonly routesFirestoreService: RouteFirestoreService,
     @Inject(LoaderService) private readonly loaderService: LoaderService,
+    @Inject(ActivatedRoute) private readonly activatedRoute: ActivatedRoute,
+    @Inject(Router) private readonly router: Router,
     @Inject(LoaderInPageService) private readonly loaderInPageService: LoaderInPageService,
   ) {
 
@@ -58,8 +63,22 @@ export class RouteManagerPageComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.form.controls.stations.push(new FormControl(null, [Validators.required]));
-    this.form.controls.carriages.push(new FormControl(null, [Validators.required]));
+    const param = this.activatedRoute.snapshot.paramMap.get('routeId');
+    this.routeId.set(param ?? '');
+
+    if (param) {
+      this.routesFirestoreService.getRouteById(param).subscribe(data => {
+        if (data) {
+          this.setInitFormData(data);
+        } else {
+          this.router.navigateByUrl('/admin/routes');
+        }
+      });
+    } else {
+      this.form.controls.stations.push(new FormControl(null, [Validators.required]));
+      this.form.controls.carriages.push(new FormControl(null, [Validators.required]));
+    }
+
 
     this.form.controls.stations.controls.forEach((_, index) => {
       this.subscribeToStationControlChanges(index);
@@ -156,5 +175,30 @@ export class RouteManagerPageComponent implements OnInit {
         followControl.setValue(null);
       }
     }
+  }
+
+  private setInitFormData(route: Route): void {
+
+    if (route.stations.length) {
+      route.stations.forEach((station: Station) => {
+        this.form.controls.stations.push(new FormControl(station, [Validators.required]));
+      });
+    }
+
+    if (route.carriages.length) {
+      route.carriages.forEach((carriage: Carriage) => {
+        this.form.controls.carriages.push(new FormControl(carriage, [Validators.required]));
+      });
+    }
+
+
+    // this.form.setValue({
+    //   stations: carriage.name,
+    //   rows: carriage.rows,
+    //   leftSeats: carriage.leftSeats,
+    //   rightSeats: carriage.rightSeats,
+    //   backLeftSeats: carriage.backLeftSeats,
+    //   backRightSeats: carriage.backRightSeats,
+    // });
   }
 }

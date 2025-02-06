@@ -61,6 +61,10 @@ export const routes: Routes = [
         path: 'route',
         children: [
           {
+            path: 'update/:routeId',
+            component: RouteManagerPageComponent,
+          },
+          {
             path: 'create',
             component: RouteManagerPageComponent,
           },

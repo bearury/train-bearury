@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, input, Output } from '@angular/core';
 import { Route } from '@interfaces/route.interface';
 import { TuiAppearance, TuiButton, TuiIcon, TuiTitle } from '@taiga-ui/core';
 import { TuiCardLarge } from '@taiga-ui/layout';
@@ -19,4 +19,18 @@ import { TuiCardLarge } from '@taiga-ui/layout';
 })
 export class CardRouteComponent {
   public route = input.required<Route>();
+
+  @Output()
+  public handleDelete = new EventEmitter<string>();
+
+  @Output()
+  public handleUpdate = new EventEmitter<string>();
+
+  public onDelete(id: string): void {
+    this.handleDelete.emit(id);
+  }
+
+  public onUpdate(id: string): void {
+    this.handleUpdate.emit(id);
+  }
 }

@@ -1,19 +1,31 @@
 @let routes = routes$ | async;
+@let loading = loading$ | async;
 
 <div class="container">
-  <button (click)="handleClickButtons()" appearance="flat" class="button-create" size="s" tuiButton>
-    <tui-icon icon="@tui.plus" />
-    Создать маршрут
-  </button>
 
-  <div class="content">
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    <button (click)="handleCreateButtons()" appearance="flat" class="button-create" size="s" tuiButton>
+      <tui-icon icon="@tui.plus" />
+      Создать маршрут
+    </button>
 
-
-    @if (routes) {
-      @for (route of routes; track route.id) {
-        <app-card-route [route]="route" />
+    <div class="content">
+      @if (routes) {
+        @for (route of routes; track route.id) {
+          <app-card-route [route]="route" (handleDelete)="onDelete($event, content)" (handleUpdate)="onUpdate($event)" />
+        }
       }
-    }
-
-  </div>
+    </div>
+  }
 </div>
+
+
+<ng-template #content>
+  <div class="wrapper-prompt">
+    После удаления маршрута восстановление, будет невозможным!!!
+  </div>
+</ng-template>
