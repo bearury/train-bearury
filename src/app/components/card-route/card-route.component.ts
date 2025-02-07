@@ -26,6 +26,14 @@ export class CardRouteComponent {
   @Output()
   public handleUpdate = new EventEmitter<string>();
 
+  @Output()
+  public handlePreview = new EventEmitter<string>();
+
+
+  public onPreview(id: string): void {
+    this.handlePreview.emit(id);
+  };
+
   public onDelete(id: string): void {
     this.handleDelete.emit(id);
   }

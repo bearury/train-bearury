@@ -3,6 +3,10 @@
     <div tuiTitle="m">"{{ route().name }}"</div>
 
     <div class="settings">
+      <button (click)="onPreview(route().id)" appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.eye" />
+      </button>
+
       <button (click)="onUpdate(route().id)" appearance="outline" size="s" tuiButton>
         <tui-icon icon="@tui.settings" />
       </button>

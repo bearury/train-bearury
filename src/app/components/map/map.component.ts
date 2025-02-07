@@ -31,6 +31,8 @@ export class MapComponent implements OnInit, AfterViewInit {
     // Костыль для перерисовки карты при повторной инициализации
     this.hostElement.nativeElement.style.minHeight = '30vh';
     this.hostElement.nativeElement.style.flex = '1 1 20%';
+
+
   }
 
   public onReadyMap(eventMap: YaReadyEvent<ymaps.Map>): void {

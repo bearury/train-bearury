@@ -3,10 +3,19 @@
 
 
 <div class="container">
-  <h1 class="title">
-    <tui-icon icon="@tui.route" />
-    Менеджер маршрута
-  </h1>
+
+  <div class="header">
+    <h1 class="title">
+      <tui-icon icon="@tui.route" />
+      Менеджер маршрута
+    </h1>
+
+    <button (click)="location.back()" appearance="outline" class="button-create" size="s" tuiButton>
+      <tui-icon icon="@tui.arrow-big-left" />
+      Назад
+    </button>
+  </div>
+
 
   @if (loading) {
     <div class="loader">
@@ -18,7 +27,7 @@
         <div class="group-fields">
           <div class="block-fields">
             <h2>Станции</h2>
-            @for (station of form.controls.stations.controls; track station; let index = $index) {
+            @for (station of form.controls.stations.controls; track index; let index = $index) {
               <div class="select-field">
                 <tui-select
                   [formControl]="station"
@@ -49,7 +58,7 @@
 
           <div class="block-fields">
             <h2>Вагоны</h2>
-            @for (carriage of form.controls.carriages.controls; track carriage; let index = $index) {
+            @for (carriage of form.controls.carriages.controls; track index; let index = $index) {
               <div class="select-field">
                 <tui-select
                   [formControl]="carriage"
@@ -91,7 +100,7 @@
               tuiButton
               type="submit"
             >
-              Сохранить
+              {{ routeId() ? 'Изменить' : 'Сохранить' }}
             </button>
           </div>
         </tui-loader>

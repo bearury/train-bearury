@@ -114,10 +114,28 @@ export class RouteFirestoreService {
     return fromPromise(deleteDoc(ref));
   }
 
-  public update(id: string): Observable<void> {
+  public update(id: string, stations: (Station | null)[], carriages: (Carriage | null)[]): Observable<string | null> {
     this.loaderInPageService.show();
     const ref = doc(this.db, 'routes', id);
-    return fromPromise(deleteDoc(ref));
+
+    return from(updateDoc(ref, {
+      carriages: removeNullFromArray<Carriage>(carriages).map(carriage => carriage.id),
+      stations: removeNullFromArray<Station>(stations).map(station => station.id),
+    })).pipe(
+      map(() => {
+        this.alert.open('Данные маршрута обновлены!').subscribe();
+        this.loaderInPageService.hide();
+        return id;
+      }),
+      catchError(err => {
+        this.alert.open('Ошибка обновления маршрута!', {
+          appearance: 'warning',
+          data: err,
+        }).subscribe();
+        this.loaderInPageService.hide();
+        return of(null);
+      }),
+    );
   }
 
   private getAllEntity(): Observable<RouteEntity[]> {

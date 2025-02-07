@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { TuiButton, TuiIcon, TuiLoader } from '@taiga-ui/core';
+import { TuiButton, TuiDialogContext, TuiDialogService, TuiIcon, TuiLoader } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { RouteFirestoreService } from '@services/firestore/route-firestore.service';
 import { Observable, tap } from 'rxjs';
@@ -9,6 +9,8 @@ import { CardRouteComponent } from '@components/card-route/card-route.component'
 import { PromptService } from '@services/promt.service';
 import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
 import { LoaderService } from '@services/loader.service';
+import { MapComponent } from '@components/map/map.component';
+import { MapService } from '@services/map.service';
 
 @Component({
   selector: 'app-routes-page',
@@ -18,6 +20,7 @@ import { LoaderService } from '@services/loader.service';
     AsyncPipe,
     CardRouteComponent,
     TuiLoader,
+    MapComponent,
   ],
   templateUrl: './routes-page.component.html',
   styleUrl: './routes-page.component.less',
@@ -31,6 +34,8 @@ export class RoutesPageComponent {
   constructor(
     @Inject(Router) private readonly router: Router,
     @Inject(PromptService) private readonly promptService: PromptService,
+    @Inject(MapService) private readonly mapService: MapService,
+    @Inject(TuiDialogService) private readonly dialog: TuiDialogService,
     @Inject(RouteFirestoreService) private readonly routesFirestoreService: RouteFirestoreService,
     @Inject(LoaderService) private readonly loaderService: LoaderService,
   ) {
@@ -44,6 +49,16 @@ export class RoutesPageComponent {
 
   public onUpdate(id: string): void {
     this.router.navigateByUrl('admin/route/update/' + id);
+  }
+
+  public onPreview(id: string, content: PolymorpheusContent<TuiDialogContext>): void {
+    this.routes$.subscribe(routes => {
+      const currentRoute = routes.find((route: Route) => route.id === id);
+      if (currentRoute) {
+        this.mapService.addBalloons(currentRoute.stations);
+      }
+    });
+    this.dialog.open(content).subscribe();
   }
 
   public onDelete(

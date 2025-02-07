@@ -10,7 +10,7 @@ import { TuiStringHandler } from '@taiga-ui/cdk';
 import { Station } from '@interfaces/station.interface';
 import { RouteFirestoreService } from '@services/firestore/route-firestore.service';
 import { LoaderService } from '@services/loader.service';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, Location } from '@angular/common';
 import { LoaderInPageService } from '@services/loader-in-page.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Route } from '@interfaces/route.interface';
@@ -49,6 +49,7 @@ export class RouteManagerPageComponent implements OnInit {
     @Inject(RouteFirestoreService) private readonly routesFirestoreService: RouteFirestoreService,
     @Inject(LoaderService) private readonly loaderService: LoaderService,
     @Inject(ActivatedRoute) private readonly activatedRoute: ActivatedRoute,
+    @Inject(Location) public readonly location: Location,
     @Inject(Router) private readonly router: Router,
     @Inject(LoaderInPageService) private readonly loaderInPageService: LoaderInPageService,
   ) {
@@ -87,7 +88,13 @@ export class RouteManagerPageComponent implements OnInit {
 
   public onSubmit(): void {
     if (this.form.valid) {
-      this.routesFirestoreService.addRoute(this.form.controls.stations.value, this.form.controls.carriages.value).subscribe();
+      const stations = this.form.controls.stations.value;
+      const carriages = this.form.controls.carriages.value;
+      if (this.routeId()) {
+        this.routesFirestoreService.update(this.routeId(), stations, carriages).subscribe();
+      } else {
+        this.routesFirestoreService.addRoute(stations, carriages).subscribe();
+      }
     } else {
       this.form.controls.stations.controls.forEach((c) => {
         c.markAsTouched();
@@ -178,6 +185,9 @@ export class RouteManagerPageComponent implements OnInit {
   }
 
   private setInitFormData(route: Route): void {
+    this.form.controls.stations.controls.length = 0;
+    this.form.controls.carriages.controls.length = 0;
+
 
     if (route.stations.length) {
       route.stations.forEach((station: Station) => {
@@ -190,15 +200,5 @@ export class RouteManagerPageComponent implements OnInit {
         this.form.controls.carriages.push(new FormControl(carriage, [Validators.required]));
       });
     }
-
-
-    // this.form.setValue({
-    //   stations: carriage.name,
-    //   rows: carriage.rows,
-    //   leftSeats: carriage.leftSeats,
-    //   rightSeats: carriage.rightSeats,
-    //   backLeftSeats: carriage.backLeftSeats,
-    //   backRightSeats: carriage.backRightSeats,
-    // });
   }
 }
