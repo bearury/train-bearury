@@ -22,6 +22,7 @@ import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
 import { tap } from 'rxjs';
 import { STATION_TEMP_ID } from '../../shared/tokens/station-temp-id.token';
 import { setErrorFormFieldError } from '../../shared/helpers/set-error-form-field';
+import { RouteFirestoreService } from '@services/firestore/route-firestore.service';
 
 
 @Component({
@@ -90,6 +91,7 @@ export class StationManagerPageComponent implements OnInit {
 
   constructor(
     @Inject(STATION_TEMP_ID) private stationTempId: string,
+    @Inject(RouteFirestoreService) private routeFirestoreService: RouteFirestoreService,
   ) {
   }
 
@@ -166,9 +168,13 @@ export class StationManagerPageComponent implements OnInit {
   public handleClickDelete(stationId: string | null, observer: PaymentResponse): void {
     this.processDeleteStation.set(true);
     if (stationId) {
-      this.stationsFirestoreService.deleteStation(stationId).subscribe(() => {
-        observer.complete();
-        this.router.navigate(['/admin/stations']);
+      this.routeFirestoreService.deleteRouteByStationId(stationId as string).subscribe(res => {
+        if (res) {
+          this.stationsFirestoreService.deleteStation(stationId).subscribe(() => {
+            observer.complete();
+            this.router.navigate(['/admin/stations']);
+          });
+        }
       });
     }
   }

@@ -24,13 +24,13 @@ import { Router } from '@angular/router';
 })
 export class StationsPageComponent implements OnInit {
   public stations$: Observable<Station[]> | undefined;
-  private stationsService = inject(StationsFirestoreService);
+  private stationsFirestoreService = inject(StationsFirestoreService);
   private loaderService = inject(LoaderService);
   public loading$ = this.loaderService.loading$;
   private router = inject(Router);
 
   public ngOnInit(): void {
-    this.stations$ = this.stationsService.getAll();
+    this.stations$ = this.stationsFirestoreService.getAll();
   }
 
   public handleClickButtons(stationId?: string): void {

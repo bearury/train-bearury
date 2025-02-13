@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, query, updateDoc } from '@angular/fire/firestore';
+import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, getDocs, query, updateDoc, where } from '@angular/fire/firestore';
 import { LoaderService } from '@services/loader.service';
 import { LoaderInPageService } from '@services/loader-in-page.service';
 import { catchError, combineLatest, first, from, map, Observable, of, switchMap, tap } from 'rxjs';
@@ -12,6 +12,7 @@ import { removeNullFromArray } from '../../helpers/remove-null-from-array';
 import { RouteEntity } from '@entitys/route.entity';
 import { Route } from '@interfaces/route.interface';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
+
 
 @Injectable({
   providedIn: 'root',
@@ -108,10 +109,46 @@ export class RouteFirestoreService {
     );
   }
 
+
+  public deleteRouteByStationId(id: string): Observable<string | null> {
+    const q = query(collection(this.db, 'routes'), where('stations', 'array-contains', id));
+
+    return fromPromise(getDocs(q)).pipe(
+      map((t) => {
+        const arr: string[] = [];
+        t.forEach((doc) => {
+          arr.push(doc.id);
+        });
+        return arr;
+      }),
+      map((resArr) => {
+        if (resArr.length) {
+          return resArr;
+        } else {
+          throw Error();
+        }
+      }),
+
+      map((routeIdArray) => routeIdArray.map((routeId) => {
+        return this.delete(routeId);
+      })),
+      tap(() => {
+        this.alert.open('Связанные маршруты удалены!').subscribe();
+      }),
+      map(() => id),
+      catchError(() => {
+        this.alert.open('При удалении, связанные маршруты не найдены!', { appearance: 'warning' }).subscribe();
+        return of(null);
+      }),
+    );
+  }
+
   public delete(id: string): Observable<void> {
     this.loaderInPageService.show();
     const ref = doc(this.db, 'routes', id);
-    return fromPromise(deleteDoc(ref));
+    return fromPromise(deleteDoc(ref)).pipe(
+      tap(() => this.loaderService.hide()),
+    );
   }
 
   public update(id: string, stations: (Station | null)[], carriages: (Carriage | null)[]): Observable<string | null> {
