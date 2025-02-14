@@ -168,13 +168,13 @@ export class StationManagerPageComponent implements OnInit {
   public handleClickDelete(stationId: string | null, observer: PaymentResponse): void {
     this.processDeleteStation.set(true);
     if (stationId) {
-      this.routeFirestoreService.deleteRouteByStationId(stationId as string).subscribe(res => {
+
+      this.stationsFirestoreService.deleteStation(stationId).subscribe((res) => {
         if (res) {
-          this.stationsFirestoreService.deleteStation(stationId).subscribe(() => {
-            observer.complete();
-            this.router.navigate(['/admin/stations']);
-          });
+          this.routeFirestoreService.deleteRouteByStationId(stationId as string).subscribe();
         }
+        observer.complete();
+        this.router.navigate(['/admin/stations']);
       });
     }
   }
