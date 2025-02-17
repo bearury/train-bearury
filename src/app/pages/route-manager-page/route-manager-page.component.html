@@ -1,0 +1,110 @@
+@let loading = loading$ | async;
+@let loadingInPage = loadingInPage$ | async;
+
+
+<div class="container">
+
+  <div class="header">
+    <h1 class="title">
+      <tui-icon icon="@tui.route" />
+      Менеджер маршрута
+    </h1>
+
+    <button (click)="location.back()" appearance="outline" class="button-create" size="s" tuiButton>
+      <tui-icon icon="@tui.arrow-big-left" />
+      Назад
+    </button>
+  </div>
+
+
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    <div class="content">
+      <form (ngSubmit)="onSubmit()" [formGroup]="form" class="form">
+        <div class="group-fields">
+          <div class="block-fields">
+            <h2>Станции</h2>
+            @for (station of form.controls.stations.controls; track index; let index = $index) {
+              <div class="select-field">
+                <tui-select
+                  [formControl]="station"
+                  [stringify]="stringifyStation"
+                  [required]="true"
+                >
+                  Станция #{{ index + 1 }}
+                  <select
+                    placeholder="Select character"
+                    tuiSelect
+                    [items]="getConnectedStationsSelect(index)"
+                  >
+                  </select>
+                </tui-select>
+                @if (form.controls.stations.controls.length > 1) {
+                  <button (click)="handleRemoveControl('stations', station)" appearance="secondary" size="s" tuiButton type="button">
+                    <tui-icon icon="@tui.trash-2" />
+                  </button>
+                }
+              </div>
+            }
+            <div class="block-button-control">
+              <button (click)="handleAddControl('stations')" appearance="secondary" size="s" tuiButton type="button">
+                <tui-icon icon="@tui.plus" />
+              </button>
+            </div>
+          </div>
+
+          <div class="block-fields">
+            <h2>Вагоны</h2>
+            @for (carriage of form.controls.carriages.controls; track index; let index = $index) {
+              <div class="select-field">
+                <tui-select
+                  [formControl]="carriage"
+                  [stringify]="stringifyCarriage"
+                  [required]="true"
+                >
+                  Вагон #{{ index + 1 }}
+                  <select
+                    placeholder="Select character"
+                    tuiSelect
+                    [items]="carriages()"
+                  >
+                  </select>
+                </tui-select>
+                @if (form.controls.carriages.controls.length > 1) {
+                  <button (click)="handleRemoveControl('carriages', carriage)" appearance="secondary" size="s" tuiButton type="button">
+                    <tui-icon icon="@tui.trash-2" />
+                  </button>
+                }
+              </div>
+            }
+            <div class="block-button-control">
+              <button (click)="handleAddControl('carriages')" appearance="secondary" size="s" tuiButton type="button">
+                <tui-icon icon="@tui.plus" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <tui-loader
+          [inheritColor]="true"
+          [overlay]="false"
+          [showLoader]="!!loadingInPage"
+          class="loader-page"
+        >
+          <div class="wrapper-loader-button">
+            <button
+              appearance="positive"
+              class="submit-button"
+              tuiButton
+              type="submit"
+            >
+              {{ routeId() ? 'Изменить' : 'Сохранить' }}
+            </button>
+          </div>
+        </tui-loader>
+      </form>
+    </div>
+  }
+</div>

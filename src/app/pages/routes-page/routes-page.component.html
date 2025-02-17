@@ -1,0 +1,40 @@
+@let routes = routes$ | async;
+@let loading = loading$ | async;
+
+<div class="container">
+
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    <button (click)="handleCreateButtons()" appearance="flat" class="button-create" size="s" tuiButton>
+      <tui-icon icon="@tui.plus" />
+      Создать маршрут
+    </button>
+
+    <div class="content">
+      @if (routes) {
+        @for (route of routes; track route.id) {
+          <app-card-route [route]="route" (handleDelete)="onDelete($event, content)" (handleUpdate)="onUpdate($event)" (handlePreview)="onPreview($event,  mapDialogContent)" />
+        }
+      }
+    </div>
+  }
+</div>
+
+
+<ng-template #content>
+  <div class="wrapper-prompt">
+    После удаления маршрута восстановление, будет невозможным!!!
+  </div>
+</ng-template>
+
+
+<ng-template #mapDialogContent>
+  <h3 class="dialog__title">Схема маршрута</h3>
+
+  <div class="map-wrapper">
+    <app-map [initValueCoordinates]="{latitude:  55.755702, longitude: 37.617531}" />
+  </div>
+</ng-template>

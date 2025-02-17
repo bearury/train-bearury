@@ -1,5 +1,7 @@
+@let balloons = balloons$ | async;
+
 <ya-map (ready)="onReadyMap($event)" (yaclick)="onClickMap($event)" [center]="[initValueCoordinates().latitude, initValueCoordinates().longitude]" [zoom]="6">
-  @for (balloon of balloons$ | async; track $index) {
+  @for (balloon of balloons; track $index) {
     <ya-placemark
       [geometry]="[balloon.latitude, balloon.longitude]"
       [options]="{iconColor: balloon.id === stationTempId ? 'green' : 'red'}"

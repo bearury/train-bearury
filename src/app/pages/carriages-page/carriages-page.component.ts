@@ -8,6 +8,7 @@ import { LoaderService } from '@services/loader.service';
 import { CarriageComponent } from '@components/carriage/carriage.component';
 import { Carriage } from '@interfaces/carriage.interface';
 import { PolymorpheusContent } from '@taiga-ui/polymorpheus';
+import { RouteFirestoreService } from '@services/firestore/route-firestore.service';
 
 @Component({
   selector: 'app-carriages-page',
@@ -31,6 +32,7 @@ export class CarriagesPageComponent implements OnInit {
 
   constructor(
     @Inject(CarriageFirestoreService) private readonly carriageFirestoreService: CarriageFirestoreService,
+    @Inject(RouteFirestoreService) private readonly routeFirestoreService: RouteFirestoreService,
     @Inject(LoaderService) private readonly loaderService: LoaderService,
     @Inject(TuiDialogService) private readonly dialog: TuiDialogService,
     @Inject(Router) private readonly router: Router,
@@ -54,8 +56,12 @@ export class CarriagesPageComponent implements OnInit {
   public onDelete(observable: Observer<void>): void {
     if (this.idOnDelete()) {
       const id = this.idOnDelete() as string;
-      this.carriageFirestoreService.delete(id).subscribe(() => {
+      
+      this.carriageFirestoreService.delete(id).subscribe((res) => {
         observable.complete();
+        if (res) {
+          this.routeFirestoreService.deleteRouteByCarriage(id).subscribe();
+        }
       });
     }
   }

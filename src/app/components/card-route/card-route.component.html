@@ -1,0 +1,53 @@
+<div class="wrapper" tuiAppearance="floating" tuiCardLarge>
+  <div class="header">
+    <div tuiTitle="m">"{{ route().name }}"</div>
+
+    <div class="settings">
+      <button (click)="onPreview(route().id)" appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.eye" />
+      </button>
+
+      <button (click)="onUpdate(route().id)" appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.settings" />
+      </button>
+
+      <button (click)="onDelete(route().id)" appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.trash-2" />
+      </button>
+    </div>
+  </div>
+
+  <div class="route">
+    <h4>Маршрут движения:</h4>
+    <div class="content">
+      @if (route().stations.length) {
+        @for (station of route().stations; track station.id + index; let index = $index) {
+          <span>
+          @if (index !== 0) {
+            <span>-</span>
+          }
+            {{ station.city }}
+        </span>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="carriages">
+    <h4>Состав вагонов:</h4>
+    <div class="content">
+      @if (route().carriages.length) {
+        @for (carriage of route().carriages; track carriage.id + index; let index = $index) {
+          <span>
+          @if (index !== 0) {
+            <span>-</span>
+          }
+            №{{ index + 1 }} {{ carriage.name }}
+        </span>
+        }
+      } @else {
+        <span>Ни один вагон не включен в состав</span>
+      }
+    </div>
+  </div>
+</div>

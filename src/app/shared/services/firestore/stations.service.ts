@@ -144,8 +144,7 @@ export class StationsFirestoreService {
     );
   }
 
-  public deleteStation(stationId: string): Observable<null> {
-
+  public deleteStation(stationId: string): Observable<string | null> {
     this.loaderInPageService.show();
 
     const connStationRef = doc(this.db, 'stations', stationId);
@@ -188,16 +187,15 @@ export class StationsFirestoreService {
           );
         });
 
-        return combineLatest(updates).pipe(map(() => null));
-
+        return combineLatest(updates).pipe(map(() => docSnapshot));
       }),
-      tap(() => {
+      map(() => {
         this.alert.open('Станция удалена!').subscribe();
         this.loaderInPageService.hide();
-        return of(null);
+        return stationId;
       }),
       catchError(() => {
-        this.alert.open('Ошибка создания станции!', { appearance: 'warning' }).subscribe();
+        this.alert.open('Ошибка удаления станции!', { appearance: 'warning' }).subscribe();
         this.loaderInPageService.hide();
         return of(null);
       }));

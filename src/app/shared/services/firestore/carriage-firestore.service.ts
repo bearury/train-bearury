@@ -81,10 +81,19 @@ export class CarriageFirestoreService {
     );
   }
 
-  public delete(id: string): Observable<void> {
+  public delete(id: string): Observable<string | null> {
     this.loaderInPageService.show();
     const ref = doc(this.db, 'carriages', id);
-    return fromPromise(deleteDoc(ref));
+    return fromPromise(deleteDoc(ref)).pipe(
+      map(() => {
+        this.loaderService.hide();
+        return id;
+      }),
+      catchError(() => {
+        this.loaderService.hide();
+        return of(null);
+      }),
+    );
   }
 
   public getCarriageById(id: string): Observable<CarriageEntity | null> {
