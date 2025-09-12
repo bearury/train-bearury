@@ -14,6 +14,7 @@ import { AsyncPipe, Location } from '@angular/common';
 import { LoaderInPageService } from '@services/loader-in-page.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Route } from '@interfaces/route.interface';
+import { HeaderInPageComponent } from '../../shared/components/header-in-page/header-in-page.component';
 
 @Component({
   selector: 'app-route-manager-page',
@@ -26,6 +27,7 @@ import { Route } from '@interfaces/route.interface';
     TuiMultiSelectModule,
     TuiSelectModule,
     AsyncPipe,
+    HeaderInPageComponent,
   ],
   templateUrl: './route-manager-page.component.html',
   styleUrl: './route-manager-page.component.less',

@@ -3,20 +3,7 @@
 
 
 <div class="container">
-
-  <div class="header">
-    <h1 class="title">
-      <tui-icon icon="@tui.route" />
-      Менеджер маршрута
-    </h1>
-
-    <button (click)="location.back()" appearance="outline" class="button-create" size="s" tuiButton>
-      <tui-icon icon="@tui.arrow-big-left" />
-      Назад
-    </button>
-  </div>
-
-
+  <app-header-in-page icon="@tui.route" title="Менеджер маршрута" />
   @if (loading) {
     <div class="loader">
       <tui-loader size="xxl" />

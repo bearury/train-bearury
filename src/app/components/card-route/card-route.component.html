@@ -3,15 +3,19 @@
     <div tuiTitle="m">"{{ route().name }}"</div>
 
     <div class="settings">
-      <button (click)="onPreview(route().id)" appearance="outline" size="s" tuiButton>
+      <button (click)="onRideManager(route().id)" [tuiHint]="'Редактор рассписания'" appearance="outline" size="s" tuiButton>
+        <tui-icon icon="@tui.scroll-text" />
+      </button>
+
+      <button (click)="onPreview(route().id)" [tuiHint]="'Карта маршрута'" appearance="outline" size="s" tuiButton>
         <tui-icon icon="@tui.eye" />
       </button>
 
-      <button (click)="onUpdate(route().id)" appearance="outline" size="s" tuiButton>
+      <button (click)="onUpdate(route().id)" [tuiHint]="'Редактировать маршрут'" appearance="outline" size="s" tuiButton>
         <tui-icon icon="@tui.settings" />
       </button>
 
-      <button (click)="onDelete(route().id)" appearance="outline" size="s" tuiButton>
+      <button (click)="onDelete(route().id)" [tuiHint]="'Удалить маршрут'" appearance="outline" size="s" tuiButton>
         <tui-icon icon="@tui.trash-2" />
       </button>
     </div>
