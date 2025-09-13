@@ -14,7 +14,7 @@
   } @else {
 
     @if (carriage) {
-      <app-carriage [carriage]="carriage" />
+      <app-carriage [carriage]="carriage" [isEditMode]="true" (handleClickEvent)="handleClickSeat($event)" />
     }
 
     <form [formGroup]="form" class="form">

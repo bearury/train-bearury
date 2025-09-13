@@ -1,12 +1,39 @@
 import { Component, DestroyRef, Inject, OnInit, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Carriage, CarriageEntity, CarriageFormData, CarriageFormValue } from '@interfaces/carriage.interface';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  Carriage,
+  CarriageEntity,
+  CarriageFormData,
+  CarriageFormValue,
+} from '@interfaces/carriage.interface';
 import { CarriageService } from '@services/carriage.service';
 import { CarriageForm } from '@interfaces/carriage-form.interface';
 import { CarriageComponent } from '@components/carriage/carriage.component';
-import { TuiFieldErrorPipe, TuiInputNumber, tuiValidationErrorsProvider } from '@taiga-ui/kit';
-import { TuiButton, TuiError, TuiLabel, TuiLoader, TuiTextfieldComponent, TuiTextfieldDirective } from '@taiga-ui/core';
-import { TuiInputNumberModule, TuiMultiSelectModule, TuiTextfieldControllerModule } from '@taiga-ui/legacy';
+import {
+  TuiDataListDropdownManager,
+  TuiFieldErrorPipe,
+  TuiInputNumber,
+  tuiValidationErrorsProvider,
+} from '@taiga-ui/kit';
+import {
+  TuiAlertService,
+  TuiButton,
+  TuiError,
+  TuiLabel,
+  TuiLoader,
+  TuiTextfieldComponent,
+  TuiTextfieldDirective,
+} from '@taiga-ui/core';
+import {
+  TuiInputNumberModule,
+  TuiMultiSelectModule,
+  TuiTextfieldControllerModule,
+} from '@taiga-ui/legacy';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CarriageFirestoreService } from '@services/firestore/carriage-firestore.service';
@@ -33,6 +60,7 @@ import { LoaderService } from '@services/loader.service';
     TuiError,
     TuiFieldErrorPipe,
     TuiLoader,
+    TuiDataListDropdownManager,
   ],
   templateUrl: './carriages-manager-page.component.html',
   styleUrl: './carriages-manager-page.component.less',
@@ -40,39 +68,53 @@ import { LoaderService } from '@services/loader.service';
   providers: [
     tuiValidationErrorsProvider({
       required: 'Поле должно быть заполнено',
-      max: ({ max }: { max: number }) =>
-        `Не должно быть больше ${max}`,
-      min: ({ min }: { min: string }) =>
-        `Не должно быть меньше ${min}`,
+      max: ({ max }: { max: number }) => `Не должно быть больше ${max}`,
+      min: ({ min }: { min: string }) => `Не должно быть меньше ${min}`,
     }),
   ],
 })
 export class CarriagesManagerPageComponent implements OnInit {
-  public form = new FormGroup<CarriageForm>({
+  public form = new FormGroup<CarriageForm>(
+    {
       name: new FormControl('', [Validators.required]),
-      rows: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(15)]),
-      leftSeats: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(5)]),
-      rightSeats: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(5)]),
+      rows: new FormControl(null, [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(15),
+      ]),
+      leftSeats: new FormControl(null, [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(5),
+      ]),
+      rightSeats: new FormControl(null, [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(5),
+      ]),
       backLeftSeats: new FormControl(null),
       backRightSeats: new FormControl(null),
-    }, { updateOn: 'change' },
+    },
+    { updateOn: 'change' }
   );
 
   public stationId = signal<string>('');
-
   public currentCarriage$: Observable<Carriage | null>;
   public isUpdateMode$: Observable<boolean>;
   public loadingInPage$: Observable<boolean>;
   public loading$: Observable<boolean>;
-
+  private isEndInitForm = signal<boolean>(false);
 
   constructor(
     @Inject(CarriageService) private readonly carriageService: CarriageService,
-    @Inject(CarriageFirestoreService) private readonly carriageFirestoreService: CarriageFirestoreService,
+    @Inject(CarriageFirestoreService)
+    private readonly carriageFirestoreService: CarriageFirestoreService,
     @Inject(DestroyRef) private readonly destroyRef: DestroyRef,
     @Inject(ActivatedRoute) private readonly activatedRoute: ActivatedRoute,
-    @Inject(LoaderInPageService) private readonly loaderInPageService: LoaderInPageService,
-    @Inject(LoaderService) private readonly loaderService: LoaderService,
+    @Inject(TuiAlertService) private readonly alert: TuiAlertService,
+    @Inject(LoaderInPageService)
+    private readonly loaderInPageService: LoaderInPageService,
+    @Inject(LoaderService) private readonly loaderService: LoaderService
   ) {
     this.currentCarriage$ = carriageService.currentCarriage$;
     this.isUpdateMode$ = carriageService.isUpdateMode$;
@@ -81,7 +123,6 @@ export class CarriagesManagerPageComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-
     const param = this.activatedRoute.snapshot.paramMap.get('carriageId');
     this.stationId.set(param ?? '');
 
@@ -90,6 +131,7 @@ export class CarriagesManagerPageComponent implements OnInit {
         this.carriageService.setUpdateMode();
         if (data) {
           this.setInitFormData(data);
+          this.isEndInitForm.set(true);
         }
       });
     } else {
@@ -97,7 +139,18 @@ export class CarriagesManagerPageComponent implements OnInit {
       this.carriageService.setCreateMode();
     }
 
-    this.form.valueChanges.subscribe((value) => {
+    this.form.valueChanges.subscribe(value => {
+      if (this.isEndInitForm()) {
+        this.alert
+          .open('Для сохранения, необходимо нажать кнопку Обновить', {
+            label: 'Внимание!!!',
+            appearance: 'warning',
+          })
+          .subscribe();
+
+        this.isEndInitForm.set(false);
+      }
+
       const { rows, rightSeats, leftSeats } = this.form.controls;
       if (rows.valid && rightSeats.valid && leftSeats.valid) {
         const carriage: CarriageFormData = {
@@ -113,34 +166,71 @@ export class CarriagesManagerPageComponent implements OnInit {
     });
   }
 
-
   public onSubmit(): void {
     if (this.form.valid) {
-      this.isUpdateMode$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((isUpdateMode) => {
-        const { name, rows, rightSeats, leftSeats, backRightSeats, backLeftSeats } = this.form.value;
+      this.isUpdateMode$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(isUpdateMode => {
+          const {
+            name,
+            rows,
+            rightSeats,
+            leftSeats,
+            backRightSeats,
+            backLeftSeats,
+          } = this.form.value;
 
-        const carriage: CarriageFormValue = {
-          name,
-          rows,
-          rightSeats,
-          leftSeats,
-          backLeftSeats,
-          backRightSeats,
-        };
+          const carriage: CarriageFormValue = {
+            name,
+            rows,
+            rightSeats,
+            leftSeats,
+            backLeftSeats,
+            backRightSeats,
+          };
 
-        if (isUpdateMode) {
-          this.carriageFirestoreService.updateCarriage(this.stationId(), carriage)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe();
-        } else {
-          this.carriageFirestoreService.addCarriage(carriage)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe();
-
-        }
-      });
+          if (isUpdateMode) {
+            this.carriageFirestoreService
+              .updateCarriage(this.stationId(), carriage)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe();
+          } else {
+            this.carriageFirestoreService
+              .addCarriage(carriage)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe();
+          }
+        });
     } else {
       setErrorFormFieldError(this.form);
+    }
+  }
+
+  protected handleClickSeat(index: number): void {
+    const numberOfSeatsInRow =
+      (this.form.value.leftSeats ?? 0) + (this.form.value.rightSeats ?? 0);
+
+    const remainderOfDivision = index % numberOfSeatsInRow;
+
+    const possibleCurrentRow = Math.floor(index / numberOfSeatsInRow);
+
+    const row = !remainderOfDivision
+      ? possibleCurrentRow
+      : possibleCurrentRow + 1;
+
+    const isRightRow =
+      numberOfSeatsInRow * row - (this.form.value.rightSeats ?? 0) < index;
+
+    const control =
+      this.form.controls[isRightRow ? 'backRightSeats' : 'backLeftSeats'];
+
+    const indexRow = control.value?.indexOf(row);
+
+    if (indexRow !== -1) {
+      const newArrRows = control.value?.filter(r => r !== row) ?? [];
+      control.setValue(newArrRows);
+    } else {
+      control.setValue([...control.value!, row]);
     }
   }
 

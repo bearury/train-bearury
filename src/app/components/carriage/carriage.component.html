@@ -20,7 +20,7 @@
                 <div class="row-index">{{ elementIndex + 1 }}</div>
               }
             </div>
-            <app-carriage-cell [backSeat]="getBackSeats(rowIndex, elementIndex)" [numberSeat]="item" />
+            <app-carriage-cell [backSeat]="getBackSeats(rowIndex, elementIndex)" [numberSeat]="item" [isEditMode]="isEditMode()" (handleClickEvent)="handleClickSeats($event)" />
           }
         </div>
       }

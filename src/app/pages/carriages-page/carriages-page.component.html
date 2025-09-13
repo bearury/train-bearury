@@ -16,7 +16,7 @@
       <div class="carriages-wrapper">
         @for (carriage of carriages; track carriage.id) {
           <div class="carriage-wrapper">
-            <app-carriage [carriage]="carriage" />
+            <app-carriage [carriage]="carriage" [isEditMode]="false" />
 
             <div class="block-buttons">
               <button tuiButton size="s" appearance="outline" (click)="onUpdate(carriage.id)">
