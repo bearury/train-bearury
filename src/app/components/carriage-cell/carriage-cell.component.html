@@ -1,4 +1,6 @@
-<button [class.back]="backSeat()"
+<button (click)="handleClick()"
+        [class.back]="backSeat()"
+        [class.edit]="isEditMode()"
         class="car-cell"
         type="button">
   <span class="number">{{ numberSeat() }}</span>

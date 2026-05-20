@@ -1,19 +1,25 @@
-import { Component, computed, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  EventEmitter,
+  input,
+  Output,
+} from '@angular/core';
 import { CarriageCellComponent } from '@components/carriage-cell/carriage-cell.component';
 import { Carriage } from '@interfaces/carriage.interface';
 import { TuiTitle } from '@taiga-ui/core';
 
 @Component({
   selector: 'app-carriage',
-  imports: [
-    CarriageCellComponent,
-    TuiTitle,
-  ],
+  imports: [CarriageCellComponent, TuiTitle],
   templateUrl: './carriage.component.html',
   styleUrl: './carriage.component.less',
 })
 export class CarriageComponent {
-  public carriage = input.required<Carriage>();
+  public readonly carriage = input.required<Carriage>();
+  public readonly isEditMode = input.required<boolean>();
+
+  @Output() public handleClickEvent = new EventEmitter<number>();
 
   public dividerIndex = computed(() => {
     const carriage = this.carriage();
@@ -34,10 +40,13 @@ export class CarriageComponent {
     return carriage.backRightSeats;
   });
 
-
   public getBackSeats(rowIndex: number, elementIndex: number): boolean {
-    return ((this.dividerIndex() < rowIndex) && this.backLeftSeats().some(el => el === elementIndex + 1)) ||
-      ((this.dividerIndex() >= rowIndex) && this.backLRightSeats().some(el => el === elementIndex + 1));
+    return (
+      (this.dividerIndex() < rowIndex &&
+        this.backLeftSeats().some(el => el === elementIndex + 1)) ||
+      (this.dividerIndex() >= rowIndex &&
+        this.backLRightSeats().some(el => el === elementIndex + 1))
+    );
   }
 
   public trackByRowIndex(index: number): number {
@@ -46,5 +55,9 @@ export class CarriageComponent {
 
   public trackByItem(item: number): number {
     return item; // Предполагается, что `item` (номер места) уникален
+  }
+
+  protected handleClickSeats(indexSeat: number): void {
+    this.isEditMode() && this.handleClickEvent.emit(indexSeat);
   }
 }

@@ -1,0 +1,18 @@
+@let loading = loading$ | async;
+<!--@let loadingInPage = loadingInPage$ | async;-->
+
+
+<div class="container">
+  @if (loading) {
+    <div class="loader">
+      <tui-loader size="xxl" />
+    </div>
+  } @else {
+    <app-header-in-page icon="@tui.scroll-text" title="Расписание маршрута {{ nameRide() }}" />
+    <button (click)="handleClickCreate()" appearance="flat" class="button-create" size="s" tuiButton>
+      <tui-icon icon="@tui.plus" />
+      Создать расписание
+    </button>
+  }
+</div>
+

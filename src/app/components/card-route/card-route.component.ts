@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, input, Output } from '@angular/core';
 import { Route } from '@interfaces/route.interface';
-import { TuiAppearance, TuiButton, TuiIcon, TuiTitle } from '@taiga-ui/core';
+import { TuiAppearance, TuiButton, TuiHintDirective, TuiIcon, TuiTitle } from '@taiga-ui/core';
 import { TuiCardLarge } from '@taiga-ui/layout';
 
 @Component({
@@ -11,6 +11,7 @@ import { TuiCardLarge } from '@taiga-ui/layout';
     TuiTitle,
     TuiButton,
     TuiIcon,
+    TuiHintDirective,
   ],
   templateUrl: './card-route.component.html',
   styleUrl: './card-route.component.less',
@@ -29,6 +30,8 @@ export class CardRouteComponent {
   @Output()
   public handlePreview = new EventEmitter<string>();
 
+  @Output()
+  public handleRideManager = new EventEmitter<string>();
 
   public onPreview(id: string): void {
     this.handlePreview.emit(id);
@@ -40,5 +43,9 @@ export class CardRouteComponent {
 
   public onUpdate(id: string): void {
     this.handleUpdate.emit(id);
+  }
+
+  public onRideManager(id: string): void {
+    this.handleRideManager.emit(id);
   }
 }

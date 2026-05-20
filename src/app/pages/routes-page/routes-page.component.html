@@ -16,7 +16,13 @@
     <div class="content">
       @if (routes) {
         @for (route of routes; track route.id) {
-          <app-card-route [route]="route" (handleDelete)="onDelete($event, content)" (handleUpdate)="onUpdate($event)" (handlePreview)="onPreview($event,  mapDialogContent)" />
+          <app-card-route
+            [route]="route"
+            (handleRideManager)="handleRideManager($event)"
+            (handleDelete)="onDelete($event, content)"
+            (handleUpdate)="onUpdate($event)"
+            (handlePreview)="onPreview($event,  mapDialogContent)"
+          />
         }
       }
     </div>
@@ -26,7 +32,7 @@
 
 <ng-template #content>
   <div class="wrapper-prompt">
-    После удаления маршрута восстановление, будет невозможным!!!
+    После удаления маршрута, восстановление будет невозможным!!!
   </div>
 </ng-template>
 

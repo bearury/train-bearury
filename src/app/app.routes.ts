@@ -6,6 +6,7 @@ import { CarriagesManagerPageComponent } from '@pages/carriages-manager-page/car
 import { CarriagesPageComponent } from '@pages/carriages-page/carriages-page.component';
 import { RoutesPageComponent } from '@pages/routes-page/routes-page.component';
 import { RouteManagerPageComponent } from '@pages/route-manager-page/route-manager-page.component';
+import { RoutesManagerPageComponent } from '@pages/routes-manager-page/routes-manager-page.component';
 
 export const routes: Routes = [
   {
@@ -55,7 +56,16 @@ export const routes: Routes = [
       },
       {
         path: 'routes',
-        component: RoutesPageComponent,
+        children: [
+          {
+            path: '',
+            component: RoutesPageComponent,
+          },
+          {
+            path: ':routesId',
+            component: RoutesManagerPageComponent,
+          },
+        ],
       },
       {
         path: 'route',

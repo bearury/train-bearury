@@ -79,4 +79,9 @@ export class RoutesPageComponent {
       )
       .subscribe();
   }
+
+
+  public handleRideManager(id: string): void {
+    this.router.navigateByUrl('admin/routes/' + id);
+  }
 }
